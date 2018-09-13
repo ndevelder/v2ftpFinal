@@ -80,7 +80,7 @@ tmp<volScalarField> v2ftpFinal::Ls() const
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-v2ftpFinal::v2ftpFinal
+v2ftpFinal::v2ftpFinal 
 (
     const volVectorField& U,
     const surfaceScalarField& phi,
@@ -132,7 +132,7 @@ v2ftpFinal::v2ftpFinal
         (
             "cD2",
        	    coeffDict_,
-            0.12
+            0.07
         )
     ),
     cD3_
@@ -150,25 +150,7 @@ v2ftpFinal::v2ftpFinal
         (
             "cD4",
        	    coeffDict_,
-            1.12
-        )
-    ),
-    cVv1_
-    (
-     	dimensionedScalar::lookupOrAddToDict
-        (
-            "cVv1",
-            coeffDict_,
-            0.0
-        )
-    ),
-    cTv1_
-    (
-     	dimensionedScalar::lookupOrAddToDict
-        (
-            "cTv1",
-            coeffDict_,
-            0.0
+            0.67
         )
     ),
     cP1_
@@ -186,7 +168,7 @@ v2ftpFinal::v2ftpFinal
         (
             "cP2",
             coeffDict_,
-            0.6
+            0.3
         )
     ),
     cP3_
@@ -195,7 +177,7 @@ v2ftpFinal::v2ftpFinal
         (
             "cP3",
             coeffDict_,
-            0.12
+            0.0
         )
     ),
     cP4_
@@ -225,60 +207,7 @@ v2ftpFinal::v2ftpFinal
             85.0
         )
     ),
-    eC1_
-    (
-        dimensionedScalar::lookupOrAddToDict
-        (
-            "eC1",
-            coeffDict_,
-            1.4
-        )
-    ),
-    eC2_
-    (
-        dimensionedScalar::lookupOrAddToDict
-        (
-            "eC2",
-            coeffDict_,
-            0.43
-        )
-    ),
-    eC3_
-    (
-        dimensionedScalar::lookupOrAddToDict
-        (
-            "eC3",
-            coeffDict_,
-            0.0
-        )
-    ),
-    eC4_
-    (
-        dimensionedScalar::lookupOrAddToDict
-        (
-            "eC4",
-            coeffDict_,
-            0.0
-        )
-    ),
-    eC5_
-    (
-        dimensionedScalar::lookupOrAddToDict
-        (
-            "eC5",
-            coeffDict_,
-            0.0
-        )
-    ),
-    eC6_
-    (
-        dimensionedScalar::lookupOrAddToDict
-        (
-            "eC6",
-            coeffDict_,
-            0.3
-        )
-    ),
+
     cMu_
     (
         dimensionedScalar::lookupOrAddToDict
@@ -306,51 +235,6 @@ v2ftpFinal::v2ftpFinal
             0.0033
         )
     ),
-	cPa_
-    (
-        dimensionedScalar::lookupOrAddToDict
-        (
-            "cPa",
-            coeffDict_,
-            1.6
-        )
-    ),
-	cPp_
-    (
-        dimensionedScalar::lookupOrAddToDict
-        (
-            "cPp",
-            coeffDict_,
-            0.0
-        )
-    ),
-    cPr_
-    (
-        dimensionedScalar::lookupOrAddToDict
-        (
-            "cPr",
-            coeffDict_,
-            0.33
-        )
-    ),
-	cPw_
-    (
-        dimensionedScalar::lookupOrAddToDict
-        (
-            "cPw",
-            coeffDict_,
-            25.0
-        )
-    ),
-	cPD_
-    (
-        dimensionedScalar::lookupOrAddToDict
-        (
-            "cPD",
-            coeffDict_,
-            0.0
-        )
-    ),
     cEhmM_
     (
         dimensionedScalar::lookupOrAddToDict
@@ -360,42 +244,6 @@ v2ftpFinal::v2ftpFinal
             10.0
         )
     ),
-    cEhmP_
-    (
-        dimensionedScalar::lookupOrAddToDict
-        (
-            "cEhmP",
-            coeffDict_,
-            0.67
-        )
-    ),
-    cEhmPK_
-    (
-        dimensionedScalar::lookupOrAddToDict
-        (
-            "cEhmPK",
-            coeffDict_,
-            0.09
-        )
-    ),
-    cEhmPK2_
-    (
-        dimensionedScalar::lookupOrAddToDict
-        (
-            "cEhmPK",
-            coeffDict_,
-            0.67
-        )
-    ),
-    cEhR_
-    (
-        dimensionedScalar::lookupOrAddToDict
-        (
-            "cEhR",
-            coeffDict_,
-            1.0
-        )
-    ),
 	cNF_
     (
         dimensionedScalar::lookupOrAddToDict
@@ -403,6 +251,15 @@ v2ftpFinal::v2ftpFinal
             "cNF",
             coeffDict_,
             1.0
+        )
+    ),
+	cNL_
+    (
+        dimensionedScalar::lookupOrAddToDict
+        (
+            "cNF",
+            coeffDict_,
+            0.0001
         )
     ),
 	rS_
@@ -441,15 +298,6 @@ v2ftpFinal::v2ftpFinal
             0.83
         )
     ),
-	rPr_
-    (
-        dimensionedScalar::lookupOrAddToDict
-        (
-            "rPr",
-            coeffDict_,
-            0.5
-        )
-    ),
 	nutRatMax_
     (
         dimensionedScalar::lookupOrAddToDict
@@ -459,101 +307,83 @@ v2ftpFinal::v2ftpFinal
             1.0e5
         )
     ),
-    sigmaKInit_
+    sigmaK_
     (
         dimensionedScalar::lookupOrAddToDict
         (
-            "sigmaKInit",
+            "sigmaK",
             coeffDict_,
             1.0
         )
     ),
-    sigmaEpsInit_
+    sigmaEps_
     (
         dimensionedScalar::lookupOrAddToDict
         (
-            "sigmaEpsInit",
+            "sigmaEps",
             coeffDict_,
             0.833
         )
     ),
-    sigmaEpsVisc_
+    sigmaPhi_
     (
         dimensionedScalar::lookupOrAddToDict
         (
-            "sigmaEpsVisc",
-            coeffDict_,
-            1.0
-        )
-    ),
-    sigmaPhiInit_
-    (
-        dimensionedScalar::lookupOrAddToDict
-        (
-            "sigmaPhiInit",
+            "sigmaPhi",
             coeffDict_,
             0.33
         )
     ),
-    sigmaPsiInit_
+    sigmaPsi_
     (
         dimensionedScalar::lookupOrAddToDict
         (
-            "sigmaPsiInit",
+            "sigmaPsi",
             coeffDict_,
             1.0
         )
     ),
-    nutScale_
+	psiDisWallType_
     (
         dimensionedScalar::lookupOrAddToDict
         (
-            "nutScale",
+            "psiDisWallType",
             coeffDict_,
             1.0
         )
     ),
-    nutBlend_
+	transType_
     (
         dimensionedScalar::lookupOrAddToDict
         (
-            "nutBlend",
+            "transType",
             coeffDict_,
             1.0
         )
     ),
-    psiNuFrac_
+	kappaType_
     (
         dimensionedScalar::lookupOrAddToDict
         (
-            "psiNuFrac",
+            "kappaType",
             coeffDict_,
             1.0
         )
     ),
-    ellipticSwitch_
+	cP1re_
     (
         dimensionedScalar::lookupOrAddToDict
         (
-            "ellipticSwitch",
+            "cP1re",
             coeffDict_,
             0.0
         )
     ),
-	coordType_
+	prodType_
     (
         dimensionedScalar::lookupOrAddToDict
         (
-            "coordType",
-            coeffDict_,
-            2.0
-        )
-    ),
-	pDir_
-    (
-        dimensionedScalar::lookupOrAddToDict
-        (
-            "pDir",
+            "prodType",
             coeffDict_,
             1.0
         )
@@ -581,15 +411,6 @@ v2ftpFinal::v2ftpFinal
         dimensionedScalar::lookupOrAddToDict
         (
             "fWallType",
-            coeffDict_,
-            1.0
-        )
-    ),	
-	apType_
-    (
-        dimensionedScalar::lookupOrAddToDict
-        (
-            "apType",
             coeffDict_,
             1.0
         )
@@ -647,26 +468,6 @@ v2ftpFinal::v2ftpFinal
    (
        coeffDict_.lookup("solveT")
    ),
-   
-   eqnSigmaK_
-   (
-       coeffDict_.lookup("eqnSigmaK")
-   ),
-
-   eqnSigmaEps_
-   (
-       coeffDict_.lookup("eqnSigmaEps")
-   ),
-
-   eqnSigmaPhi_
-   (
-       coeffDict_.lookup("eqnSigmaPhi")
-   ),
-
-   eqnSigmaPsi_
-   (
-       coeffDict_.lookup("eqnSigmaPsi")
-   ),
 
    eqncEp1_
    (
@@ -682,15 +483,7 @@ v2ftpFinal::v2ftpFinal
    (
        coeffDict_.lookup("eqnEpsHat")
    ),
-   
-   timeScaleEps_
-   (
-       coeffDict_.lookup("timeScaleEps")
-   ),
-   prodType_
-   (
-       coeffDict_.lookup("prodType")
-   ),
+
    debugWrite_
    (
        coeffDict_.lookup("debugWrite")
@@ -872,6 +665,19 @@ v2ftpFinal::v2ftpFinal
         symm(fvc::grad(U_))
     ),
 	
+	G_
+    (
+        IOobject
+        (
+            "G",
+            runTime_.timeName(),
+            U_.db(),
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        nut_*mag(S_)*mag(S_)
+    ),
+	
 	wally_
     (
         IOobject
@@ -919,9 +725,22 @@ v2ftpFinal::v2ftpFinal
             runTime_.timeName(),
             U_.db(),
             IOobject::NO_READ,
-            IOobject::NO_WRITE
+            IOobject::AUTO_WRITE
         ),
         (1.0/(1.0 + 1.5*tpphi_))
+    ),
+	
+	gamma_
+    (
+        IOobject
+        (
+            "gamma",
+            runTime_.timeName(),
+            U_.db(),
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        (1.0/(1.0 + cD4_*nut_/nu()))
     ),
 	
 	upsilon_
@@ -989,62 +808,6 @@ v2ftpFinal::v2ftpFinal
         (fvc::grad(kSqrt_))
     ),
     
-	sigmaK_
-    (
-        IOobject
-        (
-            "sigmaK",
-            runTime_.timeName(),
-            U_.db(),
-            IOobject::NO_READ,
-            IOobject::NO_WRITE
-        ),
-        mesh_,
-        (sigmaKInit_)
-    ),
-    
-	sigmaEps_
-    (
-        IOobject
-        (
-            "sigmaEps",
-            runTime_.timeName(),
-            U_.db(),
-            IOobject::NO_READ,
-            IOobject::NO_WRITE
-        ),
-        mesh_,
-        (sigmaEpsInit_)
-    ),
-    
-	sigmaPhi_
-    (
-        IOobject
-        (
-            "sigmaPhi",
-            runTime_.timeName(),
-            U_.db(),
-            IOobject::NO_READ,
-            IOobject::NO_WRITE
-        ),
-        mesh_,
-        (sigmaPhiInit_)
-    ),
-    
-	sigmaPsi_
-    (
-        IOobject
-        (
-            "sigmaPsi",
-            runTime_.timeName(),
-            U_.db(),
-            IOobject::NO_READ,
-            IOobject::NO_WRITE
-        ),
-        mesh_,
-        (sigmaPsiInit_)
-    ),
-    
 	cEp2_
     (
         IOobject
@@ -1066,7 +829,7 @@ v2ftpFinal::v2ftpFinal
             runTime_.timeName(),
             U_.db(),
             IOobject::NO_READ,
-            IOobject::AUTO_WRITE
+            IOobject::NO_WRITE
         ),
         ((2*nut_*magSqr(symm(fvc::grad(U_)))/k_))
     ),
@@ -1209,7 +972,7 @@ v2ftpFinal::v2ftpFinal
             runTime_.timeName(),
             U_.db(),
             IOobject::MUST_READ,
-            IOobject::AUTO_WRITE
+            IOobject::NO_WRITE
         ),
         tpphi_
     ),
@@ -1261,7 +1024,7 @@ v2ftpFinal::v2ftpFinal
             runTime_.timeName(),
             U_.db(),
             IOobject::NO_READ,
-            IOobject::AUTO_WRITE
+            IOobject::NO_WRITE
         ),
         fvc::ddt(U_) + fvc::div(phi_, U_) - fvc::div(phi_)*U_
     ),
@@ -1274,7 +1037,7 @@ v2ftpFinal::v2ftpFinal
             runTime_.timeName(),
             U_.db(),
             IOobject::NO_READ,
-            IOobject::AUTO_WRITE
+            IOobject::NO_WRITE
         ),
         vorticity_
     ),
@@ -1287,7 +1050,7 @@ v2ftpFinal::v2ftpFinal
             runTime_.timeName(),
             U_.db(),
             IOobject::NO_READ,
-            IOobject::AUTO_WRITE
+            IOobject::NO_WRITE
         ),
         vorticity_
     ),
@@ -1313,7 +1076,7 @@ v2ftpFinal::v2ftpFinal
             runTime_.timeName(),
             U_.db(),
             IOobject::NO_READ,
-            IOobject::AUTO_WRITE
+            IOobject::NO_WRITE
         ),
         U_/(mag(U_) + dimensionedScalar("UMinTemp", U_.dimensions(), SMALL))
     ),
@@ -1339,7 +1102,7 @@ v2ftpFinal::v2ftpFinal
             runTime_.timeName(),
             U_.db(),
             IOobject::NO_READ,
-            IOobject::AUTO_WRITE
+            IOobject::NO_WRITE
         ),
         mag(vorticity_)/(mag(U_) + dimensionedScalar("UMinTemp", U_.dimensions(), SMALL))
     ),
@@ -1532,20 +1295,12 @@ v2ftpFinal::v2ftpFinal
     // Calculate eddy viscosity
     if(solveNut_ == "true")
     {
-		if(timeScaleEps_ == "epsilon" || timeScaleEps_ != "epsHat")
-		{
-			if(nutType_ == "strain"){
-				nut_ = 0.09*k_*Ts();
-			}else{
-				nut_ = cMu_*k_*tpphi_*Ts();	
-			}
-        }
+		if(nutType_ == "strain"){
+			nut_ = 0.09*k_*Ts();
+		}else{
+			nut_ = cMu_*k_*tpphi_*Ts();	
+		}
         
-        if(timeScaleEps_ == "epsHat")
-		{
-            nut_ = cMu_*k_*tpphi_/epsHat_;
-        }
-
         nut_ = min(nut_,nutRatMax_*nu());        
         nut_.correctBoundaryConditions();
         bound(nut_,dimensionedScalar("minNut", nut_.dimensions(), SMALL));       
@@ -1555,47 +1310,8 @@ v2ftpFinal::v2ftpFinal
     //*************************************//	
     // Epsilon-tilda-hat
     //*************************************//
-    
-	if(eqnEpsHat_ == "mod")
-	{
-        epsHat_ = epsilon_/(k_ + (cEhmM_*nu()*mag(gradkSqrt_)));
-        bound(epsHat_,dimensionedScalar("minEpsHat", epsHat_.dimensions(), SMALL));
-	}
-	else if(eqnEpsHat_ == "pk")
-	{
-        epsHat_ = epsilon_/(k_ + (cEhmPK_*nu()*mag(gradk_)/(tpphi_*kSqrt_ + sqrt(k0_))));
-        bound(epsHat_,dimensionedScalar("minEpsHat", epsHat_.dimensions(), SMALL));
-	}
-	else if(eqnEpsHat_ == "pk2")
-	{
-        epsHat_ = epsilon_/(k_ + (cEhmPK2_*nu()*mag(gradk_)/(phiSqrt_ + sqrt(k0_)))); 
-        bound(epsHat_,dimensionedScalar("minEpsHat", epsHat_.dimensions(), SMALL));
-	}
-	else if(eqnEpsHat_ == "phi")
-	{		
-		volVectorField gradphiSqrt("gradphiSqrt", fvc::grad(sqrt(tpphi_*k_))) ;
-        epsHat_ = ((epsilon_)/(1.0 + cEhmP_*nu()*mag(gradphiSqrt)/(tpphi_*k_)))/(k_+k0_);
-        bound(epsHat_,dimensionedScalar("minEpsHat", epsHat_.dimensions(), SMALL));
-	}
-	else if(eqnEpsHat_ == "dif")
-	{
-        epsHat_ = (epsilon_ - 2.0*nu()*sqr(mag(gradkSqrt_)))/k_;
-        bound(epsHat_,dimensionedScalar("minEpsHat", epsHat_.dimensions(), SMALL));
-	}
-	else if(eqnEpsHat_ == "rough")
-	{
-        epsHat_ = epsilon_/(k_+k0_);
-        bound(epsHat_,dimensionedScalar("minEpsHat", epsHat_.dimensions(), SMALL));
-	}
-	else
-	{
-        Info<< "No EpsHat Model Chosen" <<endl;
-	    epsHat_ = (epsilon_)/(k_ + cEhmM_*nu()*mag(fvc::grad(kSqrt_)));
-	    bound(epsHat_,dimensionedScalar("minEpsHat", epsHat_.dimensions(), SMALL));
-	}
-
-	
-	
+    epsHat_ = epsilon_/(k_ + (cEhmM_*nu()*mag(gradkSqrt_)));
+    bound(epsHat_,dimensionedScalar("minEpsHat", epsHat_.dimensions(), SMALL));
 	
     Info<< "solveK is: " <<solveK_ <<endl;
     Info<< "solveEps is: " <<solveEps_ <<endl;
@@ -1675,38 +1391,19 @@ bool v2ftpFinal::read()
 		cL1_.readIfPresent(coeffDict());
 		cL2_.readIfPresent(coeffDict());
         cMu_.readIfPresent(coeffDict());
-		eC1_.readIfPresent(coeffDict());
-		eC2_.readIfPresent(coeffDict());
-		eC3_.readIfPresent(coeffDict());
-		eC4_.readIfPresent(coeffDict());
-		eC5_.readIfPresent(coeffDict());
-		cPa_.readIfPresent(coeffDict());
-		cPp_.readIfPresent(coeffDict());
-		apType_.readIfPresent(coeffDict());
-		cEhmP_.readIfPresent(coeffDict());
 		cEhmM_.readIfPresent(coeffDict());
-		cEhmPK_.readIfPresent(coeffDict());
-		cEhmPK2_.readIfPresent(coeffDict());
-		cEhR_.readIfPresent(coeffDict());
-		cPr_.readIfPresent(coeffDict());
 		cPrK_.readIfPresent(coeffDict());
 		cPrP_.readIfPresent(coeffDict());
 		cD1_.readIfPresent(coeffDict());
 		cD2_.readIfPresent(coeffDict());
 		cD3_.readIfPresent(coeffDict());
 		cD4_.readIfPresent(coeffDict());
-        cVv1_.readIfPresent(coeffDict());
-        cTv1_.readIfPresent(coeffDict());
 		cT_.readIfPresent(coeffDict());
 		cNF_.readIfPresent(coeffDict());
-		sigmaKInit_.readIfPresent(coeffDict());
-        sigmaEpsInit_.readIfPresent(coeffDict());
-        sigmaEpsVisc_.readIfPresent(coeffDict());
-        sigmaPhiInit_.readIfPresent(coeffDict());
-		sigmaPsiInit_.readIfPresent(coeffDict());
-		nutBlend_.readIfPresent(coeffDict());
-		nutScale_.readIfPresent(coeffDict());
-		apType_.readIfPresent(coeffDict());
+		sigmaK_.readIfPresent(coeffDict());
+        sigmaEps_.readIfPresent(coeffDict());
+        sigmaPhi_.readIfPresent(coeffDict());
+		sigmaPsi_.readIfPresent(coeffDict());
 
         return true;
     }
@@ -1727,7 +1424,7 @@ void v2ftpFinal::correct()
     //**********************************************//
 	
     const dimensionedScalar eH0("minEpsHat", epsHat_.dimensions(), ROOTVSMALL);
-	const dimensionedScalar nut0("minNut", nut_.dimensions(), ROOTVSMALL);
+	const dimensionedScalar nut0("minNut", nut_.dimensions(), SMALL);
 	const dimensionedScalar tph0("minTpphi", tpphi_.dimensions(), ROOTVSMALL);
 	const dimensionedScalar gtph0("minGTpphi", gradTpphi_.dimensions(), ROOTVSMALL);
 	const dimensionedScalar f0("fMin", f_.dimensions(), 0.0);
@@ -1844,85 +1541,52 @@ void v2ftpFinal::correct()
 	S_ = symm(uGrad_);
 	const volScalarField S2 = 2*magSqr(dev(S_));
 	const volScalarField magS = sqrt(S2);
-	volScalarField G("RASModel::G", nut_*S2); 
-	volScalarField GdK("GdK", G/(k_ + k0_));
-	const volScalarField Gnut("Gnut", nut_*S2);
 	
+	volScalarField G("RASModel::G", G_);
+	volScalarField GdK("GdK", G_/(k_ + k0_));
+	const volScalarField Gnut("Gnut", nut_*S2);
 
-	if(prodType_ == "strain"){
-		Info<< "Using strain production term" <<endl;
-		tpProd_ = GdK;
-	} else if(prodType_ == "mixed3"){
-		Info<< "Using mixed 3 production term" <<endl;
-		tpProd_ = alpha_*mag(tppsi_ & vorticity_) + pMix_*(1.0-alpha_)*cPrK_*alpha_*magS + (1.0 - pMix_)*(1.0 - alpha_)*cPrP_*tpphi_*magS;
-		G = tpProd_*k_;
-		GdK = tpProd_;	
-    } else if(prodType_ == "curvp"){
-		Info<< "Using curvp production term" <<endl;
-		tpProd_ = mag((tppsi_ & vorticity_) + (tppsi_ & B_));
-		G = tpProd_*k_;
-		GdK = tpProd_;	
-    } else if(prodType_ == "psic"){
-		Info<< "Using psic production term" <<endl;
-		tpProd_ = mag(tppsi_ & C_);
-		G = tpProd_*k_;
-		GdK = tpProd_;	
-    } else if(prodType_ == "twocomp"){
-		Info<< "Using twocomp production term" <<endl;
-		tpProd_ = mag((tppsi_ & vorticity_) + upsilon_*mag((funit_ & uGrad_) & funit_)/(k_ + k0_));
-		G = tpProd_*k_;
-		GdK = tpProd_;	
-    } else if(prodType_ == "mixed4"){
-		Info<< "Using mixed 4 production term" <<endl;
-		tpProd_ = alpha_*mag(tppsi_ & vorticity_) + 0.88*(1.0-alpha_)*GdK;
-		G = tpProd_*k_;
-		GdK = tpProd_;
-    } else if(prodType_ == "tenp"){
-		Info<< "Using tensor P production term" <<endl;
-		G = 0.5*mag(tr(Pnfp_));
-		tpProd_ = G/(k_+k0_);		
-		GdK = tpProd_;		
-	} else{
+
+	if(prodType_.value() == 1.0){
 		Info<< "Using psi-vorticity production term" <<endl;
-		tpProd_ = tppsi_ & vorticity_;
-		G = tpProd_*k_;
+		tpProd_ = mag(tppsi_ & vorticity_);		
+		G_ = tpProd_*k_;
 		GdK = tpProd_;		
 	}
+	
+	if(prodType_.value() == 2.0){
+		Info<< "Using strain production term" <<endl;
+		G_ = Gnut;
+		GdK = G_/(k_ + k0_);
+		tpProd_ = GdK;
+	} 
+	
+	if(prodType_.value() == 3.0){
+		Info<< "Using mixed 3 production term" <<endl;
+		tpProd_ = alpha_*mag(tppsi_ & vorticity_) + pMix_*(1.0-alpha_)*cPrK_*magS + (1.0-pMix_)*(1.0-alpha_)*cPrP_*tpphi_*magS;
+		G_ = tpProd_*k_;
+		GdK = tpProd_;	
+    }
+	
+	if(prodType_.value() == 4.0){
+		Info<< "Using mixed 4 production term" <<endl;
+		tpProd_ = alpha_*mag(tppsi_ & vorticity_) + 0.88*(1.0-alpha_)*Gnut/(k_ + k0_);
+		G_ = tpProd_*k_;
+		GdK = tpProd_;
+    }
+	
+	if(prodType_.value() == 5.0){
+		Info<< "Using mixed upsilon production term" <<endl;
+		tpProd_ = alpha_*mag(tppsi_ & vorticity_) + 0.5*(1.0-alpha_)*(0.22*(upsilon_/(k_ + k0_)) + tpphi_)*magS;
+		G_ = tpProd_*k_;
+		GdK = tpProd_;	
+    }
     
 	tpProdSqr_ = sqr(tpProd_);
 	tpProd3d_ = mag(psiReal() ^ vorticity_);
 	
-	const volScalarField pOD = G/epsilon_; 
-	
+	const volScalarField pOD = G_/epsilon_; 	
 	const volScalarField maxpOD = 2.0*epsilon_/epsilon_;
-	
-	
-
-	
-	
-    //*************************************//
-    // Sigma Functions 
-    //*************************************//
-    
-    if(eqnSigmaK_ == "true")
-    {
-	    sigmaK_ = 0.67+ 0.4*max(pOD, maxpOD);
-	}
-
-    if(eqnSigmaEps_ == "true")
-    {
-	    sigmaEps_ = 0.33 + 0.4*max(pOD, maxpOD); 
-    }
-
-    if(eqnSigmaPhi_ == "true")
-    {
-	    sigmaPhi_ = 0.5 + 0.4*max(pOD, maxpOD);
-	}
-
-    if(eqnSigmaPsi_ == "true")
-    {
-	    sigmaEps_ = 0.67 + 0.4*max(pOD, maxpOD);
-    }
 
 	
 	
@@ -1936,6 +1600,11 @@ void v2ftpFinal::correct()
 	volScalarField a2("a2", 2.0*alpha_ - 1.0);
 	volScalarField aa("aa", alpha_*alpha_);
 	
+	volVectorField tpphiSqrtGrad("tpphiSqrtGrad", fvc::grad(tpphiSqrt_));
+	
+	
+	//gamma_ = (1.0/(1.0 + cD4_*(1.0 - alpha_)*pow(SMALL + nut_/nu(), 0.5) + 3.0*nu()*(tpphiSqrtGrad & tpphiSqrtGrad)*T));
+    gamma_ = (1.0/(1.0 + cD4_*(1.0 - alpha_)*pow(SMALL + nut_/nu(), 0.5)));
 	
 	
     //*************************************//
@@ -1954,7 +1623,12 @@ void v2ftpFinal::correct()
 	
 	if(eqncEp1_ == "true")
 	{
-		cEp1eqn = min(2.0*(tpphi_/tpphi_),(cEp1_)*(1.0+0.09*(alpha_-0.42)));
+		//cEp1eqn = min(2.0*(tpphi_/tpphi_),(cEp1_)*(1.0+0.09*(alpha_-0.42))); 
+		//cEp1eqn = 4.0*1.4*(0.5*alpha_*(0.67-tpphi_) + (1.0-alpha_)*tpphi_);	
+        //cEp1eqn = (cEp1_-0.07)*(1.0 + 0.08*alpha_);	
+        //cEp1eqn = cEp1_*(1.0 + 0.07*sqr(gamma_));	
+		cEp1eqn = cEp1_ + 0.033*(2.0*alpha_-1.0);
+        //cEp1eqn = 2.92-cEp1_*(0.963 + 0.2*mag(tppsi_));		
 	}
 	
 	
@@ -1966,19 +1640,6 @@ void v2ftpFinal::correct()
     
     epsHat_ = epsilon_/(k_ + (cEhmM_*nu()*mag(gradkSqrt_)));
     bound(epsHat_,eH0);	
-	
-  
-	if(eqnEpsHat_ == "pk")
-	{
-        epsHat_ = epsilon_/(k_ + (2.0*cEhmPK_*nu()*mag(gradkSqrt_)/(tpphi_ + SMALL)));
-        bound(epsHat_,eH0);
-	}
-	else
-	{
-        epsHat_ = epsilon_/(k_ + (cEhmM_*nu()*mag(gradkSqrt_)));
-        bound(epsHat_,eH0);
-	}
-
 		
 	epsilon_.boundaryField().updateCoeffs();
 	
@@ -1996,7 +1657,7 @@ void v2ftpFinal::correct()
       + fvm::SuSp(-fvc::div(phi_), epsilon_)
       - fvm::laplacian(DepsilonEff(), epsilon_)
      ==
-       cEp1eqn*G*epsHat_
+       cEp1eqn*G_*epsHat_
      - fvm::Sp(cEp2_*epsHat_,epsilon_)
      + cEp3_*tpProd3d_*epsHat_
     );
@@ -2023,7 +1684,7 @@ void v2ftpFinal::correct()
       + fvm::SuSp(-fvc::div(phi_), k_)
       - fvm::laplacian(DkEff(), k_)
      ==
-        G
+        G_
       - fvm::Sp(epsilon_/(k_+k0_),k_)
     );
 
@@ -2082,33 +1743,46 @@ void v2ftpFinal::correct()
 	//volVectorField vecProd("vecProd", -1.0*(njnj*phiNow + fjfj*upsilon_)*vecPrim + (nini*phiNow + fifi*upsilon_)*vecAdd);
 	//volVectorField vecProd("vecProd", phiNow*C_ - upsilon_*B_);
 
-
 	
     //*************************************// 
     // f equation - with elliptic
     //*************************************//
 	
-	phiProd_ = -2.0*((psiNow & B_) + phiNow*Bs);
-	const volScalarField c1Comb("c1Comb", cP1_ + (3.0*eC4_)*cP1_*max(pOD, maxpOD)); 
-		
+	phiProd_ = -2.0*((psiNow & B_) + phiNow*Bs); 
+	
+	cP1eqn_ = cP1_ - gamma_;	
+	
+    //*************************************//
+    // Fix for separated flows 
+    //*************************************// 	
+
+	volScalarField cTexp("cTexp", cT_*(1.0-gamma_)*sqrt((((nu()/100.0)+nut_)/nu())));
+	
+    volScalarField transPhi("transPhi", cTexp*((2.0/3.0) - tpphi_)*tpProd_);	
+	volVectorField transPsi("transPsi", cTexp*((1.0 - alpha_)*vorticity_ - tppsi_*tpProd_));	
+	
+	
+    //*************************************//
+    // Pressure strain terms phi 
+    //*************************************// 		
 	volScalarField slowPS 
     (
         "v2ftpFinal::slowPS",
-        -c1Comb*epsHat_*bph + (eC5_/12.0)*epsHat_*((tppsi_ & tppsi_) - bup*bup + 2.0*bph*bph)	
+        -(cP1eqn_ - 1.0 + gamma_)*bph/T 	 
 	);
 	
 	volScalarField fastPS
     (
         "v2ftpFinal::fastPS",
-		cP2_*(2.0/3.0)*GdK
+		0.667*(cP2_ + (0.3 - cP2_))*GdK
 	);
 	
 	   
-	volScalarField fwall
+	volScalarField fwall 
     (
         "v2ftpFinal::fwall",
 		(2.0*alpha_-1.0)*epsHat_*tpphi_
-	);
+	); 
 		
 
     tmp<fvScalarMatrix> fEqn
@@ -2118,7 +1792,8 @@ void v2ftpFinal::correct()
       - fvm::Sp(1.0/L2, f_)
 	  + fwall/L2
       + slowPS/L2 
-	  + fastPS/L2        
+	  + fastPS/L2
+	  + transPhi/L2
     );
  
     fEqn().relax();
@@ -2126,7 +1801,7 @@ void v2ftpFinal::correct()
 	
     
 	
-	
+
 
     //*************************************//
     // Phi/K equation - with elliptic
@@ -2143,20 +1818,17 @@ void v2ftpFinal::correct()
 		//phiProd_/(k_+k0_)
 		
 	    //Source - pressure strain
-        min(f_,(slowPS + fastPS + fwall))
-		
-        //BC wall correct	  
+        min(f_,(slowPS + fastPS + fwall + transPhi))
+		   
+        //BC wall correct	
 	  - fvm::Sp(fwall/(tpphi_+tph0),tpphi_)
 	  
 	    //From k eqn phi/k derivation
       - fvm::Sp(GdK, tpphi_)
-	  + epsHat_*tpphi_
 
-	    // Dissipation 
-	  - fvm::Sp((cD1_ + 2.0)*alpha_*epsHat_, tpphi_)
-	  - cD2_*(1.0-alpha_)*epsHat_
-	  //+ (cVv1_*nu())*(gradk_ & gradTpphi_)/(k_+k0_) Cross diffusion left out
-    );
+	    // Dissipation included in pressure strain term
+	    //+ (1.0-gamma_)*bph/T
+    ); 
 	
 
     tpphiEqn().relax();
@@ -2169,87 +1841,157 @@ void v2ftpFinal::correct()
     // Psi Equation
     //*************************************//
 	volVectorField vecProd("vecProd", phiNow*vorticity_);
+	volVectorField curvProd("curvProd", upsilon_*B_);
 	volVectorField addedPsiProd("addedPsiProd", tppsi_ & roTen);
-	wdamp_ = nutFrac();
+	volVectorField gradNut("gradNut", fvc::grad(nut_));
+	volScalarField nutKhalf("nutKhalf", nut_/(kSqrt_ + sqrt(k0_)));
+	volVectorField gradNutKhalf("gradNutKhalf", fvc::grad(nutKhalf));
+	volScalarField dWp("dWp", alpha_*(gradNut & gradNut)/(k_ + k0_));
+	volScalarField dWpTwo("dWpTwo", alpha_*(gradNutKhalf & gradNutKhalf));
+
+	volVectorField psiDisWall("psiDisWall", (epsHat_*tppsi_));
+
+	if(psiDisWallType_.value() == 0.0){
+		Info << "Using no inhomogeneity" << endl;
+		psiDisWall = 0.0*epsHat_*tppsi_;
+	}
 	
+	if(psiDisWallType_.value() == 1.0){
+		Info << "Using 2a-1 epsHat inhomogeneity with cD1=" << cD1_  << endl;
+		psiDisWall = cD1_*(1.0 - 4.0*cTexp)*(2.0*alpha_-1.0)*epsHat_*tppsi_;
+	}
+	
+	if(psiDisWallType_.value() == 2.0){
+		Info << "Using beta1 inhomogeneity with cD2=" << cD2_  << endl;
+		psiDisWall = cD2_*min(0.22*tpphi_, dWp)*vorticity_;
+	}
+	
+	if(psiDisWallType_.value() == 3.0){
+		Info << "Using beta2 inhomogeneity with cD2=" << cD2_  << endl;
+		psiDisWall = cD2_*min(0.22*tpphi_, dWpTwo)*vorticity_;  
+	}
+	
+	if(psiDisWallType_.value() == 4.0){
+		Info << "Using beta3 inhomogeneity with cD2=" << cD2_  << endl;
+		psiDisWall = cD2_*gamma_*(2.0*alpha_-1.0)*tpphi_*vorticity_;
+	}
+	
+	if(psiDisWallType_.value() == 5.0){
+		Info << "Using unit vorticity inhomogeneity with cD2=" << cD2_  << endl;
+		psiDisWall = cD2_*gamma_*(2.0*alpha_-1.0)*tpphi_*epsHat_*(vorticity_/mag(vorticity_));
+	}
     
     tmp<fvVectorMatrix> tppsiEqn
     (
         fvm::ddt(tppsi_)
       + fvm::div(phi_, tppsi_)
       + fvm::Sp(-fvc::div(phi_), tppsi_)
-      - fvm::laplacian(DpsiEff(), tppsi_)
+      - fvm::laplacian(DpsiEff(), tppsi_) 
 
       ==
 
 	  // Production
-	    vecProd/(k_+k0_) 
+	    vecProd/(k_+k0_)
 	  + addedPsiProd //3d Psi production
 
 	  // Slow Pressure Strain
-      - fvm::Sp(c1Comb*epsHat_,tppsi_)
+      - fvm::Sp(cP1eqn_*nutFrac()/T,tppsi_)
 	  
 	  // Fast Pressure Strain      
 	  - cP2_*vecProd/(k_+k0_)
+	  - 2.0*((2.0/5.0) - (2.0/3.0)*(cP2_ + (0.3 - cP2_)))*(1.0-alpha_)*vorticity_
 	  
-	  // Dissipation
-	  - fvm::Sp(cD3_*alpha_*epsHat_,tppsi_)
+	  // Dissipation 
+	  + (1.0-gamma_)*tppsi_/T 
+	  + psiDisWall   
 	  
 	  // From K equation
-	  + epsHat_*tppsi_
-	  - fvm::Sp(tpProd_,tppsi_) 
-	  
-	  // Gradients
-      //+ (cTv1_*nut_)*(gradk_ & gradTppsi_)/(k_+k0_)
+	  - fvm::Sp(tpProd_,tppsi_)
 
 	  // Transition Term
-      + cT_*sqrt((((nu()/100.0)+nut_)/nu()))*vorticity_
+      + transPsi 
     );
 
     if(solvePsi_ == "true")
     {
 		tppsiEqn().relax();
-		solve(tppsiEqn);   
+		solve(tppsiEqn);    
     }  
 
 
+	
+	
+	
+	//*************************************//
+    // Solve temperature as passive scalar - moved to solver
+    //*************************************//
+	
+	// volScalarField prtdurbin("prtdurbin", 1.0/(0.5882+0.228*(nut_/nu())-0.0441*sqr(nut_/nu())*(1.0-exp(-5.165*nu()/(nut_ + (nu()/1000.0))))));
+	
+	// volScalarField kappaEff
+	// (
+		// "kappaEff",
+		// nu()/pr_ + (mag(tppsi_*k_)/(mag(vorticity_) + 0.02*nu()/L2))/prtdurbin
+	// );
+	
+	// if(kappaType_.value() == 2.0){
+		// Info << "Using nut with half durbin prt" << endl;
+		// kappaEff = nu()/pr_ + 0.5*nut_/prtdurbin;
+	// }
+	
+	// if(kappaType_.value() == 3.0){
+		// Info << "Using nut with constant prt" << endl;
+		// kappaEff = nu()/pr_ + nut_/prt_;
+	// }
+	
+	// if(kappaType_.value() == 4.0){
+		// Info << "Using psi/omega with constant prt" << endl;
+		// kappaEff = nu()/pr_ + (mag(tppsi_*k_)/(mag(vorticity_) + 0.02*nu()/L2))/prt_;
+	// }
+	
+	// volScalarField Cp
+	// (
+		// "Cp",
+		// 1.006 + tpphi_/(1000.0*tpphi_)
+	// );
+
+	// tmp<fvScalarMatrix> TEqn
+	// (
+		// fvm::ddt(T_)
+	  // + fvm::div(phi_, T_)
+	  // - fvm::Sp(fvc::div(phi_), T_)
+	  // - fvm::laplacian(kappaEff, T_)         
+	// );  
+    
+	// if(solveT_ == "true")	
+	// {
+		// TEqn().relax();
+		// solve(TEqn);
+	// }
+	
+	
+	
 	
 	//*************************************//
     // Calculate eddy viscosity
     //*************************************//
     
+	volScalarField tppsiSqr("tppsiSqr", (tppsi_ & tppsi_)); 
+	volScalarField cMuEqn("cMuEqn", (0.09 + 0.18*(1.7-alpha_)*(0.667-tpphi_) + 0.2*mag(tppsi_))); 
+	//cMuEqn = (0.12 + 0.25*sqrt(tppsiSqr + SMALL));
+	 
     if(solveNut_ == "true")
     {       
-		nut_ = cMu_*k_*tpphi_*T;	  
-        nut_ = min(nut_,nutRatMax_*nu()); 
+		if(eqncMu_ == "true"){
+			nut_ = cMuEqn*k_*tpphi_*T;
+		}else{
+			nut_ = cMu_*k_*tpphi_*T;
+		}
+		nut_ = min(nut_,nutRatMax_*nu()); 
 		nut_.correctBoundaryConditions();
-        bound(nut_,nut0);
-    }	
-	
-	//*************************************//
-    // Solve temperature as passive scalar
-    //*************************************//
-	
-	volScalarField kappaEff
-	(
-		"kappaEff",
-		nu()/pr_ + nut_/prt_
-	);
-
-	tmp<fvScalarMatrix> TEqn
-	(
-		fvm::ddt(T_)
-	  + fvm::div(phi_, T_)
-	  - fvm::Sp(fvc::div(phi_), T_)
-	  - fvm::laplacian(kappaEff, T_)         
-	);
-    
-	if(solveT_ == "true")	
-	{
-		TEqn().relax();
-		solve(TEqn);
-	}
-	
+        bound(nut_,nut0); 
+    }
+	 
 	
     //*************************************//   
     // Output some min/max debug values
@@ -2259,33 +2001,36 @@ void v2ftpFinal::correct()
 	{
     
     volScalarField phiActual("phiActual",tpphi_*k_);
-	volVectorField psiActual("psiActual",tppsi_*k_);
+	volVectorField psiActual("psiActual",tppsi_*k_); 
 	volScalarField uTauSquared((nu() + nut_)*vorticity_.component(2));
 	volVectorField addedPsiG(addedPsiProd*k_);
 	volVectorField phiOmega(tpphi_*k_*vorticity_);
 	volVectorField prodDiff(vecProd - phiOmega); 
 	volScalarField moreProd(upsilon_*mag((funit_ & uGrad_) & funit_));
-	volVectorField transTerm(0.0033*sqrt((((nu()/100.0)+nut_)/nu()))*vorticity_*k_);
+	volScalarField nonLinPSphi((4.2/12.0)*epsHat_*((tppsi_ & tppsi_) - bup*bup + 2.0*bph*bph));
 	
 
 	Info << "***************************" << endl;
 	Info << "Max addedPsiG: " << gMax(addedPsiG) << " Min addedPsiG: " << gMin(addedPsiG) << endl;
-	Info << "Max transTerm: " << gMax(transTerm) << " Min transTerm: " << gMin(transTerm) << endl;
+	Info << "Max nonLinPSphi: " << gMax(nonLinPSphi) << " Min nonLinPSphi: " << gMin(nonLinPSphi) << endl;
+	Info << "Max transTermPsi: " << gMax(transPsi) << " Min transTermPsi: " << gMin(transPsi) << endl;
+	Info << "Max transTermPhi: " << gMax(transPhi) << " Min transTermPhi: " << gMin(transPhi) << endl;
 	Info << "Max moreProd: " << gMax(moreProd) << " Min moreProd: " << gMin(moreProd) << endl;
 	Info << "Max phiProd: " << gMax(phiProd_) << " Min phiProd: " << gMin(phiProd_) << endl;
+	Info << "Max psiDisWall: " << gMax(psiDisWall) << " Min psiDisWall: " << gMin(psiDisWall) << endl;
 	Info << "Max phiOmega: " << gMax(phiOmega) << " Min phiOmega: " << gMin(phiOmega) << endl;
 	Info << "Max vecProd: " << gMax(vecProd) << " Min vecProd: " << gMin(vecProd) << endl;
 	Info << "Max prodDiff: " << gMax(prodDiff) << " Min prodDiff: " << gMin(prodDiff) << endl;
 	Info << "Max cEps1: " << gMax(cEp1eqn) << " Min cEps1: " << gMin(cEp1eqn) << endl;
-	Info<< "Max f: " << gMax(f_) << " Min f: " << gMin(f_) << " Max G: " << gMax(G) << " Max Gnut: " << gMax(Gnut) << endl;
+	Info<< "Max f: " << gMax(f_) << " Min f: " << gMin(f_) << " Max G: " << gMax(G) << " Min G: " << gMin(G) << " Max Gnut: " << gMax(Gnut) << endl;
     Info<< "Max nut: " << gMax(nut_) << " Max K: " << gMax(k_) << " Max Epsilon: " << gMax(epsilon_) << " Max Phi: " << gMax(phiActual) <<endl;
     Info<< "Max Psi: " << gMax(psiActual) << " Min Psi: " << gMin(psiActual) << endl;
 	//Info<< "XX: " << tensor::XX << " YY: " << tensor::YY << " XY: " << tensor::XY << endl;
     Info<< "Max 3D Production: " << gMax(tpProd3d_) << " Max uTauSquared: " << gMax(uTauSquared) << endl;
 	Info<< "Max vorticity: " << gMax(vorticity_) << " Min vorticity: " << gMin(vorticity_) << endl;
-	Info << "***************************" << endl;
+	Info << "***************************" << endl;   
 	}
-	
+	  
 	
 
 }

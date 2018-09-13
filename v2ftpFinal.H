@@ -83,55 +83,35 @@ class v2ftpFinal
             dimensionedScalar cD2_;
             dimensionedScalar cD3_;
             dimensionedScalar cD4_;
-            dimensionedScalar cVv1_;
-            dimensionedScalar cTv1_;
             dimensionedScalar cP1_;
             dimensionedScalar cP2_;
             dimensionedScalar cP3_;
             dimensionedScalar cP4_;
 			dimensionedScalar cL1_;
 			dimensionedScalar cL2_;
-			dimensionedScalar eC1_;
-            dimensionedScalar eC2_;
-            dimensionedScalar eC3_;
-            dimensionedScalar eC4_;
-			dimensionedScalar eC5_;
-			dimensionedScalar eC6_;
             dimensionedScalar cMu_;
 			dimensionedScalar betaK_;
             dimensionedScalar cT_;
-            dimensionedScalar cPa_;
-            dimensionedScalar cPp_;
-            dimensionedScalar cPr_; 
-            dimensionedScalar cPw_;
-            dimensionedScalar cPD_;
             dimensionedScalar cEhmM_;
-            dimensionedScalar cEhmP_;
-			dimensionedScalar cEhmPK_;
-			dimensionedScalar cEhmPK2_;
-            dimensionedScalar cEhR_;
 			dimensionedScalar cNF_;
+			dimensionedScalar cNL_;
 			dimensionedScalar rS_;
 			dimensionedScalar pMix_;
 			dimensionedScalar cPrK_;
 			dimensionedScalar cPrP_;
-			dimensionedScalar rPr_;
 			dimensionedScalar nutRatMax_;
-            dimensionedScalar sigmaKInit_;
-            dimensionedScalar sigmaEpsInit_;
-            dimensionedScalar sigmaEpsVisc_;
-            dimensionedScalar sigmaPhiInit_;
-            dimensionedScalar sigmaPsiInit_;
-            dimensionedScalar nutScale_;
-            dimensionedScalar nutBlend_;
-            dimensionedScalar psiNuFrac_;
-			dimensionedScalar ellipticSwitch_;
-			dimensionedScalar coordType_;
-			dimensionedScalar pDir_;
+            dimensionedScalar sigmaK_;
+            dimensionedScalar sigmaEps_;
+            dimensionedScalar sigmaPhi_;
+            dimensionedScalar sigmaPsi_;
+			dimensionedScalar psiDisWallType_;
+			dimensionedScalar transType_;
+			dimensionedScalar kappaType_;
+			dimensionedScalar cP1re_;
+			dimensionedScalar prodType_;
 			dimensionedScalar fastPsType_;
 			dimensionedScalar slowPsType_;
 			dimensionedScalar fWallType_;
-			dimensionedScalar apType_;
 			dimensionedScalar pr_;
 			dimensionedScalar prt_;
             word              nutType_;
@@ -141,15 +121,9 @@ class v2ftpFinal
             word              solvePhi_;
             word              solveNut_;
 			word              solveT_;
-            word              eqnSigmaK_;
-            word              eqnSigmaEps_;
-            word              eqnSigmaPhi_;
-            word              eqnSigmaPsi_;
             word              eqncEp1_;
             word              eqncEp2_;
        	    word              eqnEpsHat_;
-            word              timeScaleEps_;
-			word              prodType_;
 			word              debugWrite_;
 			word              tslimiter_;
 			word              lslimiter_;
@@ -175,19 +149,17 @@ class v2ftpFinal
             volTensorField uGrad_;
 			volScalarField T_;
 			volSymmTensorField S_;
+			volScalarField G_;
 			volScalarField wally_;
             volScalarField epsHat_;
 			volScalarField kSqrt_;
 			volScalarField alpha_;
+			volScalarField gamma_;
 			volScalarField upsilon_;
 			volScalarField chi_;
 			volScalarField phiSqrt_;
 			volScalarField phiProd_;
 			volVectorField gradkSqrt_;
-			volScalarField sigmaK_;
-			volScalarField sigmaEps_;
-			volScalarField sigmaPhi_;
-			volScalarField sigmaPsi_;
 			volScalarField cEp2_;
 			volScalarField tpProd_;
 			volScalarField addedPhiProd_;
@@ -272,7 +244,8 @@ public:
         //- Return the turbulence viscosity
         virtual tmp<volScalarField> nut() const
         {
-            return nut_;
+			//return mag(tppsi_)*k_/(mag(vorticity_) + (cNL_*nu()/sqr(Ls())));
+            return mag(tppsi_)*k_/(mag(vorticity_) + (cNL_/Ts()));
         }
 
         //- Return the phi/k
@@ -324,7 +297,7 @@ public:
         {
             return tmp<volScalarField>
             (
-                new volScalarField("nutFrac", nut()/(nut()+cNF_*alpha_*nu()))
+                new volScalarField("nutFrac", nut_/(nut_+cNF_*nu()))
             );
         }
 
@@ -346,7 +319,7 @@ public:
         {
             return tmp<volScalarField>
             (
-                new volScalarField("nuEff", nut() + nu())
+                new volScalarField("nuEff", nut_ + nu())
             );
         }
 		

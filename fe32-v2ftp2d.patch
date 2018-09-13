@@ -1,11 +1,11 @@
---- v2ftp2D/v2ftp2D.C	2018-02-16 13:53:53.930126202 -0500
-+++ v2ftp2D/v2ftp2D.C	2018-02-16 13:59:50.193661458 -0500
+--- v2ftpFinal/v2ftpFinal.C	2018-02-16 13:53:53.930126202 -0500
++++ v2ftpFinal/v2ftpFinal.C	2018-02-16 13:59:50.193661458 -0500
 @@ -527,12 +527,12 @@
  }
  
  // Term that is directly added to the momentum equation
--tmp<fvVectorMatrix> v2ftp2D::divDevReff() const
-+tmp<fvVectorMatrix> v2ftp2D::divDevReff(volVectorField& U) const
+-tmp<fvVectorMatrix> v2ftpFinal::divDevReff() const
++tmp<fvVectorMatrix> v2ftpFinal::divDevReff(volVectorField& U) const
  {
      return
      (
@@ -18,8 +18,8 @@
      );
  }
  
---- v2ftp2D/v2ftp2D.H	2018-02-16 13:53:53.930126202 -0500
-+++ v2ftp2D/v2ftp2D.H	2018-02-16 14:00:11.341825690 -0500
+--- v2ftpFinal/v2ftpFinal.H	2018-02-16 13:53:53.930126202 -0500
++++ v2ftpFinal/v2ftpFinal.H	2018-02-16 14:00:11.341825690 -0500
 @@ -292,7 +292,7 @@
          virtual tmp<volSymmTensorField> devReff() const;
  
