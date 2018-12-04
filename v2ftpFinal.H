@@ -79,10 +79,11 @@ class v2ftpFinal
             dimensionedScalar cEp1_;
             dimensionedScalar cEp2con_;
             dimensionedScalar cEp3_;
-            dimensionedScalar cD1_;
+			dimensionedScalar cEp4_;
+			dimensionedScalar cD1_;
             dimensionedScalar cD2_;
-            dimensionedScalar cD3_;
-            dimensionedScalar cD4_;
+			dimensionedScalar cG_;
+			dimensionedScalar cGw_;
             dimensionedScalar cP1_;
             dimensionedScalar cP2_;
             dimensionedScalar cP3_;
@@ -92,10 +93,10 @@ class v2ftpFinal
             dimensionedScalar cMu_;
 			dimensionedScalar betaK_;
             dimensionedScalar cT_;
+			dimensionedScalar cA_;
             dimensionedScalar cEhmM_;
 			dimensionedScalar cNF_;
 			dimensionedScalar cNL_;
-			dimensionedScalar rS_;
 			dimensionedScalar pMix_;
 			dimensionedScalar cPrK_;
 			dimensionedScalar cPrP_;
@@ -104,23 +105,13 @@ class v2ftpFinal
             dimensionedScalar sigmaEps_;
             dimensionedScalar sigmaPhi_;
             dimensionedScalar sigmaPsi_;
-			dimensionedScalar psiDisWallType_;
-			dimensionedScalar transType_;
-			dimensionedScalar kappaType_;
-			dimensionedScalar cP1re_;
 			dimensionedScalar prodType_;
-			dimensionedScalar fastPsType_;
-			dimensionedScalar slowPsType_;
-			dimensionedScalar fWallType_;
-			dimensionedScalar pr_;
-			dimensionedScalar prt_;
-            word              nutType_;
+			dimensionedScalar nutType_;
             word              solveK_;
             word              solveEps_;
             word              solvePsi_;
             word              solvePhi_;
             word              solveNut_;
-			word              solveT_;
             word              eqncEp1_;
             word              eqncEp2_;
        	    word              eqnEpsHat_;
@@ -128,7 +119,6 @@ class v2ftpFinal
 			word              tslimiter_;
 			word              lslimiter_;
 			word			  eqncMu_;
-			word			  phiType_;
 
 
         //- Wall distance field
