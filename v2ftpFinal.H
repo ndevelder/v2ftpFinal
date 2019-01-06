@@ -88,8 +88,13 @@ class v2ftpFinal
             dimensionedScalar cP2_;
             dimensionedScalar cP3_;
             dimensionedScalar cP4_;
+			dimensionedScalar cP5_;
 			dimensionedScalar cL1_;
 			dimensionedScalar cL2_;
+			dimensionedScalar cN1_;
+			dimensionedScalar cN2_;
+			dimensionedScalar cND1_;
+			dimensionedScalar cND2_;
             dimensionedScalar cMu_;
 			dimensionedScalar betaK_;
             dimensionedScalar cT_;
@@ -107,6 +112,7 @@ class v2ftpFinal
             dimensionedScalar sigmaPsi_;
 			dimensionedScalar prodType_;
 			dimensionedScalar nutType_;
+			dimensionedScalar psExtraType_;
             word              solveK_;
             word              solveEps_;
             word              solvePsi_;
@@ -140,6 +146,8 @@ class v2ftpFinal
 			volScalarField T_;
 			volSymmTensorField S_;
 			volScalarField G_;
+			volScalarField ndsPhi_;
+			volScalarField ndsPsi_;
 			volScalarField wally_;
             volScalarField epsHat_;
 			volScalarField kSqrt_;
@@ -336,7 +344,7 @@ public:
         {
             return tmp<volScalarField>
             (
-                new volScalarField("DphiEff", nut_*sigmaPhi_ + nu())
+                new volScalarField("DphiEff", nut_*ndsPhi_*sigmaPhi_ + nu())
             );
         }
 
@@ -345,7 +353,7 @@ public:
         {
             return tmp<volScalarField>
             (
-                new volScalarField("DpsiEff", nut_*sigmaPsi_ + nu())
+                new volScalarField("DpsiEff", nut_*ndsPsi_*sigmaPsi_ + nu())
             );
         }
 

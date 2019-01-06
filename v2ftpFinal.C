@@ -196,6 +196,15 @@ v2ftpFinal::v2ftpFinal
             0.02
         )
     ),
+    cP5_
+    (
+        dimensionedScalar::lookupOrAddToDict
+        (
+            "cP5",
+            coeffDict_,
+            0.0
+        )
+    ),
     cL1_
     (
         dimensionedScalar::lookupOrAddToDict
@@ -214,7 +223,42 @@ v2ftpFinal::v2ftpFinal
             85.0
         )
     ),
-
+    cN1_
+    (
+        dimensionedScalar::lookupOrAddToDict
+        (
+            "cN1",
+            coeffDict_,
+            0.6
+        )
+    ),
+    cN2_
+    (
+        dimensionedScalar::lookupOrAddToDict
+        (
+            "cN2",
+            coeffDict_,
+            2.2
+        )
+    ),
+    cND1_
+    (
+        dimensionedScalar::lookupOrAddToDict
+        (
+            "cND1",
+            coeffDict_,
+            0.8
+        )
+    ),
+    cND2_
+    (
+        dimensionedScalar::lookupOrAddToDict
+        (
+            "cND2",
+            coeffDict_,
+            0.6
+        )
+    ),
     cMu_
     (
         dimensionedScalar::lookupOrAddToDict
@@ -368,7 +412,15 @@ v2ftpFinal::v2ftpFinal
             3.0
         )
     ),
-
+	psExtraType_
+    (
+        dimensionedScalar::lookupOrAddToDict
+        (
+            "psExtraType",
+            coeffDict_,
+            1.0
+        )
+    ),
    solveK_
    (
        coeffDict_.lookup("solveK")
@@ -581,7 +633,7 @@ v2ftpFinal::v2ftpFinal
             runTime_.timeName(),
             U_.db(),
             IOobject::NO_READ,
-            IOobject::AUTO_WRITE
+            IOobject::NO_WRITE
         ),
         symm(fvc::grad(U_))
     ),
@@ -597,6 +649,32 @@ v2ftpFinal::v2ftpFinal
             IOobject::AUTO_WRITE
         ),
         nut_*mag(S_)*mag(S_)
+    ),
+	
+	ndsPhi_
+    (
+        IOobject
+        (
+            "ndsPhi",
+            runTime_.timeName(),
+            U_.db(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        tpphi_
+    ),
+	
+	ndsPsi_
+    (
+        IOobject
+        (
+            "ndsPsi",
+            runTime_.timeName(),
+            U_.db(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        tpphi_
     ),
 	
 	wally_
@@ -672,7 +750,7 @@ v2ftpFinal::v2ftpFinal
             runTime_.timeName(),
             U_.db(),
             IOobject::NO_READ,
-            IOobject::AUTO_WRITE
+            IOobject::NO_WRITE
         ),
         k_
     ),
@@ -685,7 +763,7 @@ v2ftpFinal::v2ftpFinal
             runTime_.timeName(),
             U_.db(),
             IOobject::NO_READ,
-            IOobject::AUTO_WRITE
+            IOobject::NO_WRITE
         ),
         k_
     ),
@@ -711,7 +789,7 @@ v2ftpFinal::v2ftpFinal
             runTime_.timeName(),
             U_.db(),
             IOobject::NO_READ,
-            IOobject::AUTO_WRITE
+            IOobject::NO_WRITE
         ),
         (R() && (skew(fvc::grad(U_))))
     ),
@@ -919,7 +997,7 @@ v2ftpFinal::v2ftpFinal
             runTime_.timeName(),
             U_.db(),
             IOobject::NO_READ,
-            IOobject::AUTO_WRITE
+            IOobject::NO_WRITE
         ),
         tpphi_
     ),
@@ -984,7 +1062,7 @@ v2ftpFinal::v2ftpFinal
             runTime_.timeName(),
             U_.db(),
             IOobject::NO_READ,
-            IOobject::AUTO_WRITE
+            IOobject::NO_WRITE
         ),
         U_/(mag(U_) + dimensionedScalar("UMinTemp", U_.dimensions(), SMALL))
     ),
@@ -1305,8 +1383,11 @@ bool v2ftpFinal::read()
         cP2_.readIfPresent(coeffDict());
         cP3_.readIfPresent(coeffDict());
 		cP4_.readIfPresent(coeffDict());
+		cP5_.readIfPresent(coeffDict());
 		cL1_.readIfPresent(coeffDict());
 		cL2_.readIfPresent(coeffDict());
+		cN1_.readIfPresent(coeffDict());
+		cN2_.readIfPresent(coeffDict());
         cMu_.readIfPresent(coeffDict());
 		cEhmM_.readIfPresent(coeffDict());
 		cPrK_.readIfPresent(coeffDict());
@@ -1622,12 +1703,20 @@ void v2ftpFinal::correct()
 	const volScalarField rII("rII", sqrt(phiActual*phiActual + (psiActual & psiActual) + k0_*k0_));
 	
 	chi_ = 2.0*alpha_*rII;
-	upsilon_ = 2.0*k_ - tpphi_*k_ - chi_ ;
+	upsilon_ = (4.0/3.0)*(1.75*alpha_-0.375)*k_ ;
 
+	const volScalarField uudk("uudk",upsilon_/k_);
+	const volScalarField wwdk("wwdk",chi_/k_);
+	
 	const volScalarField bup("bup", upsilon_/k_ - (2.0/3.0));
     const volScalarField bph("bph", tpphi_ - (2.0/3.0));
 	const volScalarField bch("bch", chi_/k_ - (2.0/3.0));
-
+	
+    volScalarField IIb("IIb", alpha_*(2.0*alpha_-1.0));
+	bound(IIb, SMALL);
+	volScalarField Det("Det", (27.0/8.0)*(uudk*tpphi_*wwdk - wwdk*(tppsi_ & tppsi_)));
+	bound(Det, SMALL);
+	
 
 	
     //*************************************// 
@@ -1649,7 +1738,8 @@ void v2ftpFinal::correct()
 	volScalarField cTexp("cTexp", cT_*(1.0-gamma_)*sqrt((((nu()/100.0)+nut_)/nu())));
 	
     volScalarField transPhi("transPhi", cTexp*cA_*((2.0/3.0) - tpphi_)*tpProd_);	
-	volVectorField transPsi("transPsi", cTexp*((1.0 - alpha_)*vorticity_ - cA_*tppsi_*tpProd_));	
+	volVectorField transPsi("transPsi", cTexp*((1.0 - alpha_)*vorticity_ - cA_*tppsi_*tpProd_));
+	
 	
 	
 	
@@ -1736,9 +1826,26 @@ void v2ftpFinal::correct()
 	volVectorField vecProd("vecProd", phiActual*vorticity_);
 	volVectorField curvProd("curvProd", upsilon_*B_);
 	volVectorField addedPsiProd("addedPsiProd", tppsi_ & roTen);
-	volVectorField psiDisWall("psiDisWall", cD1_*gamma_*(2.0*alpha_-1.0)*tpphi_*vorticity_);
-
+	
     
+	volVectorField psExtra("psExtra", cP3_*(1.0-sqrt(IIb))*vorticity_);
+	
+	if(psExtraType_.value() == 1.0){
+		psExtra = cP3_*(1.0-sqrt(IIb))*vorticity_;
+	}
+	
+	if(psExtraType_.value() == 2.0){
+		psExtra = cP3_*(1.0/6.0)*(pow(Det,(2.0/3.0)))*vorticity_;
+	}
+	
+	if(psExtraType_.value() == 3.0){
+		psExtra = cP3_*(1.0-alpha_)*vorticity_;
+	}	
+
+	
+	volVectorField psiDisWall("psiDisWall", cD1_*sqr(gamma_)*psExtra);
+    
+	
     tmp<fvVectorMatrix> tppsiEqn
     (
         fvm::ddt(tppsi_)
@@ -1750,19 +1857,19 @@ void v2ftpFinal::correct()
 
 	  // Production
 	    vecProd/(k_+k0_)
-	  + addedPsiProd //3d Psi production
+	  //+ addedPsiProd //3d Psi production
 
 	  // Slow Pressure Strain
-      - fvm::Sp(cP1eqn_*nutFrac()/T,tppsi_)
-	  
+      - fvm::Sp(cP1eqn_*nutFrac()*epsHat_,tppsi_)
+	      
 	  // Fast Pressure Strain      
 	  - cP2_*vecProd/(k_+k0_)
-	  //- cP3_*(1.0-alpha_)*vorticity_
-	  - fvm::Sp((cP3_/cMu_)*tpProd_,tppsi_)
-	  + cP4_*pow(nut_/nu()+SMALL,0.5)*tpProd_*tppsi_
+	  - psExtra
+
+	  + cP4_*((1.0-gamma_)/sqrt(1.12-alpha_))*sqrt((epsilon_ + epsilonSmall_)/nu())*tppsi_
 	  
 	  // Dissipation 
-	  + (1.0-gamma_)*nutFrac()*tppsi_/T 
+	  + (1.0-gamma_)*nutFrac()*tppsi_*epsHat_ 
 	  + psiDisWall   
 	  
 	  // From K equation
@@ -1780,44 +1887,19 @@ void v2ftpFinal::correct()
 
 	
 	
-	
+
+    
 	//*************************************//
     // Calculate eddy viscosity
     //*************************************//
-    
-	volScalarField tppsiSqr("tppsiSqr", (tppsi_ & tppsi_)); 
-	volScalarField cMuEqn("cMuEqn", (0.09 + 0.18*(1.7-alpha_)*(0.667-tpphi_) + 0.2*mag(tppsi_))); 
 
-	if(solveNut_ == "true")     
-    {
-		nut_ = cMu_*k_*tpphi_*T;
-		Info<< "Nut type: " << nutType_.value() << endl; 
-		
-		if(nutType_.value() == 1.0){
-			Info<< "Using standard nut" << endl;
-		}
-		
-		if(nutType_.value() == 2.0){
-			Info<< "Using phi^2 + psi^2 nut" << endl;
-			nut_ = cMu_*((4.0/3.0)*sqr(phiActual) + (8.0/3.0)*(psiActual & psiActual))/epsilon_;
-		}
-		
-		if(nutType_.value() == 3.0){
-			Info<< "Using phik + psi^2 nut" << endl;
-			nut_ = cMu_*((8.0/12.0)*phiActual + (24.0/12.0)*(psiActual & tppsi_))*T;
-		}
-		
-		if(nutType_.value() == 4.0){
-			Info<< "Using alpha w/ phik + psi^2 nut" << endl;
-			nut_ = 0.21*(1.286*(1.0-alpha_)*phiActual*k_ + 4.762*alpha_*(psiActual & psiActual))/epsilon_;
-		}
-		
-		nut_ = min(nut_,nutRatMax_*nu()); 
-		nut_.correctBoundaryConditions();
-        bound(nut_,nut0); 
-    }
-	 
+	nut_ = cMu_*(cN1_*phiActual + cN2_*(psiActual & tppsi_))*k_/epsilon_;	    
+	nut_ = min(nut_,nutRatMax_*nu()); 
+	nut_.correctBoundaryConditions();
+    bound(nut_,nut0); 
 	
+	ndsPhi_ = cND1_ + (1.0 - cND1_)*(psiActual & psiActual)/(cMu_*phiActual*k_);
+	ndsPsi_ = cND2_ + (1.0 - cND2_)*(psiActual & psiActual)/(cMu_*phiActual*k_);
 	
 	
     //*************************************//   
