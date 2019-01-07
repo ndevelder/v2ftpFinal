@@ -489,7 +489,7 @@ v2ftpFinal::v2ftpFinal
             "k",
             runTime_.timeName(),
             U_.db(),
-            IOobject::MUST_READ,
+            IOobject::MUST_READ,  
             IOobject::AUTO_WRITE
         ),
         mesh_
@@ -611,20 +611,7 @@ v2ftpFinal::v2ftpFinal
         ),
         (fvc::grad(U_))
     ),
-	
-	T_
-    (
-        IOobject
-        (
-            "T",
-            runTime_.timeName(),
-            U_.db(),
-            IOobject::MUST_READ,
-            IOobject::AUTO_WRITE
-        ),
-        mesh_
-    ),
-	
+
 	S_
     (
         IOobject

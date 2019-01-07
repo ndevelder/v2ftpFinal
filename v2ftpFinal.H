@@ -143,7 +143,6 @@ class v2ftpFinal
             volVectorField vorticity_;
             volVectorField tppsi_;
             volTensorField uGrad_;
-			volScalarField T_;
 			volSymmTensorField S_;
 			volScalarField G_;
 			volScalarField ndsPhi_;
