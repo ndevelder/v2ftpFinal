@@ -69,8 +69,8 @@ v2ftpFinalCoeffs{
    nutRatMax 		   1e5;
    cN1                 0.6;
    cN2                 2.2;
-   cND1                0.8;
-   cND2				   0.8;
+   cND1                1.0;
+   cND2		       1.0;
    
    cL1	               0.36;
    cL2                 75.0; 
@@ -83,7 +83,7 @@ v2ftpFinalCoeffs{
    psExtraType         1.0;
    cP1                 1.8; 
    cP2                 0.3;
-   cP3                 0.21;
+   cP3                 0.22;
    cP4                 0.009;
    cP5                 0.0;
 
