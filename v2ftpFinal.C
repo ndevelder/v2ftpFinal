@@ -1579,22 +1579,20 @@ void v2ftpFinal::correct()
     //*************************************//
     
 	alpha_ = 1.0/(1.0 + 1.5*tpphi_);
-	volScalarField a1("a1", 1.0 - alpha_);
-	volScalarField a2("a2", 2.0*alpha_ - 1.0);
-	volScalarField aa("aa", alpha_*alpha_);
 	
-	//gamma_ = (1.0/(1.0 + cG_*(1.0 - alpha_)*pow(SMALL + nut_/nu(), 0.5) + 3.0*nu()*(tpphiSqrtGrad & tpphiSqrtGrad)*T));
-    //gamma_ = (1.0/(1.0 + cG_*(1.0 - alpha_)*pow(SMALL + nut_/nu(), 0.5)));
+	volScalarField IIb("IIb", alpha_*(2.0*alpha_-1.0));	
+	bound(IIb, SMALL);
 	
-	volScalarField phiActual("phiActual", tpphi_*k_);
-	volVectorField psiActual("psiActual", tppsi_*k_);
+	volScalarField phiActual("phiActual",tpphi_*k_);
+	volVectorField psiActual("psiActual",tppsi_*k_);
 	
-	volVectorField tpphiSqrtGrad("tpphiSqrtGrad", fvc::grad(tpphiSqrt_));
-	volScalarField gammaWall("gammaWall", 3.0*nu()*(tpphiSqrtGrad & tpphiSqrtGrad)*k_/epsilon_);
-	volScalarField gammaNut("gammaNut",(alpha_*(psiActual & psiActual) + 0.57*(1.0-alpha_)*phiActual*phiActual)/epsilon_);  
-	
-	gamma_ = 1.0/(1.0 + cG_*gammaNut/nu() + cGw_*gammaWall);
+	volScalarField nutExact("nutExact", mag(psiActual)/(mag(vorticity_) + (cNL_/Ts())));
 
+	//volScalarField gammaNut("gammaNut", (alpha_*(psiActual & psiActual) + 0.57*(1.0-alpha_)*phiActual*phiActual)/(epsHat_*k_));
+	volScalarField gammaNut("gammaNut", pow(IIb, 0.5)*nutExact + (1.0-pow(IIb, 0.5))*cMu_*phiActual/epsHat_);
+	volScalarField gammaWall("gammaWall", 3.0*nu()*(gradTpphiSqrt & gradTpphiSqrt)*k_/epsilon_); 
+
+	gamma_ = 1.0/(1.0 + cG_*gammaNut/nu() + cGw_*gammaWall);
 	
 	
     //*************************************//
@@ -1699,8 +1697,6 @@ void v2ftpFinal::correct()
     const volScalarField bph("bph", tpphi_ - (2.0/3.0));
 	const volScalarField bch("bch", chi_/k_ - (2.0/3.0));
 	
-    volScalarField IIb("IIb", alpha_*(2.0*alpha_-1.0));
-	bound(IIb, SMALL);
 	volScalarField Det("Det", (27.0/8.0)*(uudk*tpphi_*wwdk - wwdk*(tppsi_ & tppsi_)));
 	bound(Det, SMALL);
 	
