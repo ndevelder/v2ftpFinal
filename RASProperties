@@ -33,10 +33,10 @@ v2ftpFinalCoeffs{
    eqnSigmaPhi         false;
    eqnSigmaPsi         false;
 
-   sigmaK			   1.0; 
+   sigmaK			   1.1; 
    sigmaEps 		   0.83; 
    sigmaPhi       	   0.42;
-   sigmaPsi       	   1.0;
+   sigmaPsi       	   1.1;
    
    prodType            1.0;
    pMix  	           0.5;
@@ -77,7 +77,7 @@ v2ftpFinalCoeffs{
    tslimiter           true;
    lslimiter           true;   
  
-   cD1                 0.12; 
+   cD1                 0.15; 
    cD2                 0.0;
 
    psExtraType         1.0;
