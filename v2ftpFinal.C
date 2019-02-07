@@ -1843,7 +1843,7 @@ void v2ftpFinal::correct()
 	  //+ addedPsiProd //3d Psi production
 
 	  // Slow Pressure Strain
-      - fvm::Sp(cP1eqn_*nutFrac()*epsHat_,tppsi_)
+      - fvm::Sp(cP1eqn_*epsHat_,tppsi_)
 	      
 	  // Fast Pressure Strain      
 	  - cP2_*vecProd/(k_+k0_)
@@ -1852,7 +1852,7 @@ void v2ftpFinal::correct()
 	  + cP4_*((1.0-gamma_)/sqrt(1.12-alpha_))*sqrt((epsilon_ + epsilonSmall_)/nu())*tppsi_
 	  
 	  // Dissipation 
-	  + (1.0-gamma_)*nutFrac()*tppsi_*epsHat_ 
+	  + (1.0-gamma_)*tppsi_*epsHat_ 
 	  + psiDisWall   
 	  
 	  // From K equation
@@ -1869,14 +1869,20 @@ void v2ftpFinal::correct()
     }  
 
 	
-	
+	psiActual = tppsi_*k_;
+	phiActual = tpphi_*k_;
 
     
 	//*************************************//
     // Calculate eddy viscosity
     //*************************************//
 
-	nut_ = cMu_*(cN1_*phiActual + cN2_*(psiActual & tppsi_))*k_/epsilon_;	    
+	//nut_ = cMu_*(cN1_*phiActual + cN2_*(psiActual & tppsi_))*k_/epsilon_;	
+
+	nut_ = (cN1_ + (1.0-cN1_)*(psiActual & psiActual)/(cMu_*phiActual*k_))*cMu_*phiActual/epsHat_;
+	
+	//nut_ = cMu_*(cN1_ + cN2_*sqrt(IIb))*tpphi_*k_*T;
+    
 	nut_ = min(nut_,nutRatMax_*nu()); 
 	nut_.correctBoundaryConditions();
     bound(nut_,nut0); 
