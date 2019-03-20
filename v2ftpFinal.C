@@ -1537,6 +1537,13 @@ void v2ftpFinal::correct()
 		GdK = tpProd_;		
 	}
 	
+	if(prodType_.value() == 1.1){
+		Info<< "Using psi-vorticity prod - no mag" <<endl;
+		tpProd_ = tppsi_ & vorticity_;		   
+		G_ = tpProd_*k_;
+		GdK = tpProd_;		
+	}
+	
 	if(prodType_.value() == 2.0){
 		Info<< "Using strain production term" <<endl;
 		G_ = Gnut;
@@ -1587,9 +1594,30 @@ void v2ftpFinal::correct()
 	volVectorField psiActual("psiActual",tppsi_*k_);
 	
 	volScalarField nutExact("nutExact", mag(psiActual)/(mag(vorticity_) + (cNL_/Ts())));
-
+    volScalarField gammaNut("gammaNut", nut_);
+	
 	//volScalarField gammaNut("gammaNut", (alpha_*(psiActual & psiActual) + 0.57*(1.0-alpha_)*phiActual*phiActual)/(epsHat_*k_));
-	volScalarField gammaNut("gammaNut", pow(IIb, 0.5)*nutExact + (1.0-pow(IIb, 0.5))*cMu_*phiActual/epsHat_);
+	
+	if(nutType_.value() == 1.0){
+		gammaNut = pow(IIb, 0.5)*nutExact + (1.0-pow(IIb, 0.5))*cMu_*phiActual/epsHat_;
+	}
+	
+	if(nutType_.value() == 2.0){
+		gammaNut = alpha_*nutExact + (1.0-alpha_)*cMu_*phiActual/epsHat_;
+	}
+	
+	if(nutType_.value() == 3.0){
+		gammaNut = alpha_*alpha_*nutExact + (1.0-alpha_*alpha_)*cMu_*phiActual/epsHat_;
+	}
+	
+	if(nutType_.value() == 4.0){
+		gammaNut = (alpha_*(psiActual & psiActual) + 0.57*(1.0-alpha_)*phiActual*phiActual)/(epsHat_*k_);
+	}
+	
+	if(nutType_.value() == 5.0){
+		gammaNut = alpha_*nutExact + 0.5*(1.0-alpha_)*phiActual*phiActual/(epsHat_*k_);
+	}
+	
 	volScalarField gammaWall("gammaWall", 3.0*nu()*(gradTpphiSqrt & gradTpphiSqrt)*k_/epsilon_); 
 
 	gamma_ = 1.0/(1.0 + cG_*gammaNut/nu() + cGw_*gammaWall);
@@ -1826,8 +1854,8 @@ void v2ftpFinal::correct()
 	}	
 
 	
-	volVectorField psiDisWall("psiDisWall", cD1_*sqr(gamma_)*psExtra);
-    
+	//volVectorField psiDisWall("psiDisWall", cD1_*sqr(gamma_)*psExtra);
+    volVectorField psiDisWall("psiDisWall", cD1_*gamma_*(2.0*alpha_-1.0)*tpphi_*vorticity_);
 	
     tmp<fvVectorMatrix> tppsiEqn
     (
@@ -1843,16 +1871,17 @@ void v2ftpFinal::correct()
 	  //+ addedPsiProd //3d Psi production
 
 	  // Slow Pressure Strain
-      - fvm::Sp(cP1eqn_*epsHat_,tppsi_)
+      - fvm::Sp(cP1eqn_/T,tppsi_)
 	      
 	  // Fast Pressure Strain      
 	  - cP2_*vecProd/(k_+k0_)
 	  - psExtra
-
+	  
+	  // Extra term for transition/fixing hump recirc zone
 	  + cP4_*((1.0-gamma_)/sqrt(1.12-alpha_))*sqrt((epsilon_ + epsilonSmall_)/nu())*tppsi_
 	  
 	  // Dissipation 
-	  + (1.0-gamma_)*tppsi_*epsHat_ 
+	  + (1.0-gamma_)*tppsi_/T
 	  + psiDisWall   
 	  
 	  // From K equation
@@ -1877,9 +1906,9 @@ void v2ftpFinal::correct()
     // Calculate eddy viscosity
     //*************************************//
 
-	//nut_ = cMu_*(cN1_*phiActual + cN2_*(psiActual & tppsi_))*k_/epsilon_;	
+	//nut_ = cMu_*(0.6*phiActual + 2.2*(psiActual & tppsi_))*k_/epsilon_;	
 
-	nut_ = (cN1_ + (1.0-cN1_)*(psiActual & psiActual)/(cMu_*phiActual*k_))*cMu_*phiActual/epsHat_;
+	nut_ = (cN1_ + (1.0-cN1_)*(psiActual & psiActual)/(cMu_*phiActual*k_))*cMu_*phiActual*k_/epsilon_;
 	
 	//nut_ = cMu_*(cN1_ + cN2_*sqrt(IIb))*tpphi_*k_*T;
     
