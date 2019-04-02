@@ -1855,7 +1855,7 @@ void v2ftpFinal::correct()
 
 	
 	//volVectorField psiDisWall("psiDisWall", cD1_*sqr(gamma_)*psExtra);
-    volVectorField psiDisWall("psiDisWall", cD1_*gamma_*(2.0*alpha_-1.0)*tpphi_*vorticity_);
+    volVectorField psiDisWall("psiDisWall", cD1_*gamma_*(1.0-sqrt(IIb))*vorticity_);
 	
     tmp<fvVectorMatrix> tppsiEqn
     (
@@ -1875,6 +1875,7 @@ void v2ftpFinal::correct()
 	      
 	  // Fast Pressure Strain      
 	  - cP2_*vecProd/(k_+k0_)
+	  + cP2_*(2.0/3.0)*tppsi_*tpProd_
 	  - psExtra
 	  
 	  // Extra term for transition/fixing hump recirc zone
