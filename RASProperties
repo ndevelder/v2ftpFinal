@@ -73,7 +73,7 @@ v2ftpFinalCoeffs{
    cND2				   1.0;
    
    cL1	               0.33; 
-   cL2                 80.0; 
+   cL2                 85.0; 
    tslimiter           true;
    lslimiter           true;   
  
@@ -82,8 +82,8 @@ v2ftpFinalCoeffs{
 
    psExtraType         1.0;
    cP1                 1.7; 
-   cP2                 0.4;
-   cP3                 0.2;
+   cP2                 0.45;
+   cP3                 0.17;
    cP4                 0.009;
    cP5                 0.0;
 

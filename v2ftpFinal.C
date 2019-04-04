@@ -139,7 +139,7 @@ v2ftpFinal::v2ftpFinal
         (
             "cD2",
        	    coeffDict_,
-            0.07
+            1.0
         )
     ),
     cG_
@@ -1615,12 +1615,12 @@ void v2ftpFinal::correct()
 	}
 	
 	if(nutType_.value() == 5.0){
-		gammaNut = alpha_*nutExact + 0.5*(1.0-alpha_)*phiActual*phiActual/(epsHat_*k_);
+		gammaNut = alpha_*nutExact + 0.5*(1.0-alpha_)*tpphi_*nut_;
 	}
 	
-	volScalarField gammaWall("gammaWall", 3.0*nu()*(gradTpphiSqrt & gradTpphiSqrt)*k_/epsilon_); 
+	volScalarField gammaWall("gammaWall", 3.0*nu()*(gradTpphiSqrt & gradTpphiSqrt)*T); 
 
-	gamma_ = 1.0/(1.0 + cG_*gammaNut/nu() + cGw_*gammaWall);
+	gamma_ = 1.0/(1.0 + cG_*gammaNut/nu() + cGw_*gammaWall); 
 	
 	
     //*************************************//
@@ -1871,14 +1871,14 @@ void v2ftpFinal::correct()
 	  //+ addedPsiProd //3d Psi production
 
 	  // Slow Pressure Strain
-      - fvm::Sp(cP1eqn_/T,tppsi_)
+      - fvm::Sp(cD2_*cP1eqn_/T,tppsi_)
 	      
 	  // Fast Pressure Strain      
 	  - cP2_*vecProd/(k_+k0_)
 	  + cP2_*(2.0/3.0)*tppsi_*tpProd_
-	  - psExtra
+	  - psExtra  
 	  
-	  // Extra term for transition/fixing hump recirc zone
+	  // Extra term for fixing hump recirc zone
 	  + cP4_*((1.0-gamma_)/sqrt(1.12-alpha_))*sqrt((epsilon_ + epsilonSmall_)/nu())*tppsi_
 	  
 	  // Dissipation 
@@ -1909,7 +1909,7 @@ void v2ftpFinal::correct()
 
 	//nut_ = cMu_*(0.6*phiActual + 2.2*(psiActual & tppsi_))*k_/epsilon_;	
 
-	nut_ = (cN1_ + (1.0-cN1_)*(psiActual & psiActual)/(cMu_*phiActual*k_))*cMu_*phiActual*k_/epsilon_;
+	nut_ = (cN1_ + (1.0-cN1_)*(psiActual & psiActual)/(cMu_*phiActual*k_))*cMu_*phiActual*T;
 	
 	//nut_ = cMu_*(cN1_ + cN2_*sqrt(IIb))*tpphi_*k_*T;
     
