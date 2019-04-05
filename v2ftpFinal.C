@@ -1618,7 +1618,7 @@ void v2ftpFinal::correct()
 		gammaNut = alpha_*nutExact + 0.5*(1.0-alpha_)*tpphi_*nut_;
 	}
 	
-	volScalarField gammaWall("gammaWall", 3.0*nu()*(gradTpphiSqrt & gradTpphiSqrt)*T); 
+	volScalarField gammaWall("gammaWall", 3.0*nu()*(gradTpphiSqrt & gradTpphiSqrt)*k_/epsilon_); 
 
 	gamma_ = 1.0/(1.0 + cG_*gammaNut/nu() + cGw_*gammaWall); 
 	
