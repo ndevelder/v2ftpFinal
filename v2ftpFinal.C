@@ -412,6 +412,15 @@ v2ftpFinal::v2ftpFinal
             3.0
         )
     ),
+	cp1Type_
+    (
+        dimensionedScalar::lookupOrAddToDict
+        (
+            "cp1Type",
+            coeffDict_,
+            1.0
+        )
+    ),
 	psExtraType_
     (
         dimensionedScalar::lookupOrAddToDict
@@ -1392,6 +1401,7 @@ bool v2ftpFinal::read()
 		sigmaPsi_.readIfPresent(coeffDict());
 		prodType_.readIfPresent(coeffDict());
 		nutType_.readIfPresent(coeffDict());
+		cp1Type_.readIfPresent(coeffDict());
 
         return true;
     }
@@ -1615,12 +1625,12 @@ void v2ftpFinal::correct()
 	}
 	
 	if(nutType_.value() == 5.0){
-		gammaNut = alpha_*nutExact + 0.5*(1.0-alpha_)*tpphi_*nut_;
+		gammaNut = alpha_*nutExact + (0.5/cMu_)*(1.0-alpha_)*tpphi_*nut_;
 	}
 	
 	volScalarField gammaWall("gammaWall", 3.0*nu()*(gradTpphiSqrt & gradTpphiSqrt)*k_/epsilon_); 
 
-	gamma_ = 1.0/(1.0 + cG_*gammaNut/nu() + cGw_*gammaWall); 
+	gamma_ = 1.0/(1.0 + cG_*gammaNut/nu() + cGw_*gammaWall);
 	
 	
     //*************************************//
@@ -1668,9 +1678,9 @@ void v2ftpFinal::correct()
       + fvm::SuSp(-fvc::div(phi_), epsilon_)
       - fvm::laplacian(DepsilonEff(), epsilon_)
      ==
-       cEp1eqn*G_*epsHat_
-     - fvm::Sp(cEp2_*epsHat_,epsilon_)
-     + cEp3_*tpProd3d_*epsHat_
+       cEp1eqn*G_/T
+     - fvm::Sp(cEp2_/T,epsilon_)
+     + cEp3_*tpProd3d_/T
     );
 
     if(solveEps_ == "true")
@@ -1734,11 +1744,28 @@ void v2ftpFinal::correct()
     // f equation - with elliptic
     //*************************************//
 	
-	//phiProd_ = -2.0*((psiNow & B_) + phiNow*Bs); 
-	
 	cP1eqn_ = cP1_ - gamma_;
+	
+	
+	if(cp1Type_.value() == 1.0){
+		cP1eqn_ = cP1_*tpphi_/tpphi_;
+	}
 
-	//cP1eqn_ = (cP1_*alpha_+1.0)*(1.0-gamma_); 
+	if(cp1Type_.value() == 2.0){
+		cP1eqn_ = cP1_ - gamma_;
+	}
+
+	if(cp1Type_.value() == 3.0){
+		cP1eqn_ = cP1_ - 0.2 + 0.2*((psiActual & psiActual)/(cMu_*phiActual*k_));
+	}	
+	
+	if(cp1Type_.value() == 4.0){
+		cP1eqn_ = cP1_ - sqr(gamma_);
+	}
+	
+	if(cp1Type_.value() == 5.0){
+		cP1eqn_ = cP1_ - 0.8 + 0.8*gamma_*(1.0-sqrt(IIb));
+	}
 	
 	
 	
@@ -1875,15 +1902,14 @@ void v2ftpFinal::correct()
 	      
 	  // Fast Pressure Strain      
 	  - cP2_*vecProd/(k_+k0_)
-	  + cP2_*(2.0/3.0)*tppsi_*tpProd_
-	  - psExtra  
+	  - (cP3_-cD1_*gamma_)*(1.0-sqrt(IIb))*vorticity_  
 	  
 	  // Extra term for fixing hump recirc zone
 	  + cP4_*((1.0-gamma_)/sqrt(1.12-alpha_))*sqrt((epsilon_ + epsilonSmall_)/nu())*tppsi_
 	  
 	  // Dissipation 
 	  + (1.0-gamma_)*tppsi_/T
-	  + psiDisWall   
+	  // Near wall included in Fast Pressure Strain 
 	  
 	  // From K equation
 	  - fvm::Sp(tpProd_,tppsi_)
@@ -1909,7 +1935,7 @@ void v2ftpFinal::correct()
 
 	//nut_ = cMu_*(0.6*phiActual + 2.2*(psiActual & tppsi_))*k_/epsilon_;	
 
-	nut_ = (cN1_ + (1.0-cN1_)*(psiActual & psiActual)/(cMu_*phiActual*k_))*cMu_*phiActual*T;
+	nut_ = (cN1_ + (2.0/3.0)*(psiActual & psiActual)/(cMu_*phiActual*k_))*cMu_*phiActual/epsHat_;
 	
 	//nut_ = cMu_*(cN1_ + cN2_*sqrt(IIb))*tpphi_*k_*T;
     
@@ -1934,16 +1960,12 @@ void v2ftpFinal::correct()
 	
 
 	Info << " * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" << endl;
-	Info << "Max addedPsiG: " << gMax(addedPsiG) << " Min addedPsiG: " << gMin(addedPsiG) << endl;
-	Info << "Max transTermPsi: " << gMax(transPsi) << " Min transTermPsi: " << gMin(transPsi) << endl;
-	Info << "Max transTermPhi: " << gMax(transPhi) << " Min transTermPhi: " << gMin(transPhi) << endl;
 	Info << "Max psiDisWall: " << gMax(psiDisWall) << " Min psiDisWall: " << gMin(psiDisWall) << endl;
 	Info << "Max phiOmega: " << gMax(phiOmega) << " Min phiOmega: " << gMin(phiOmega) << endl;
 	Info << "Max cEps1: " << gMax(cEp1eqn) << " Min cEps1: " << gMin(cEp1eqn) << endl;
 	Info<< "Max f: " << gMax(f_) << " Min f: " << gMin(f_) << " Max G: " << gMax(G) << " Min G: " << gMin(G) << " Max Gnut: " << gMax(Gnut) << endl;
     Info<< "Max nut: " << gMax(nut_) << " Max K: " << gMax(k_) << " Max Epsilon: " << gMax(epsilon_) << " Max Phi: " << gMax(phiActual) <<endl;
     Info<< "Max Psi: " << gMax(psiActual) << " Min Psi: " << gMin(psiActual) << endl;
-    Info<< "Max 3D Production: " << gMax(tpProd3d_) << " Max uTauSquared: " << gMax(uTauSquared) << endl;
 	Info<< "Max vorticity: " << gMax(vorticity_) << " Min vorticity: " << gMin(vorticity_) << endl;
 	Info << " * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" << endl;  
 	}

@@ -112,6 +112,7 @@ class v2ftpFinal
             dimensionedScalar sigmaPsi_;
 			dimensionedScalar prodType_;
 			dimensionedScalar nutType_;
+			dimensionedScalar cp1Type_;
 			dimensionedScalar psExtraType_;
             word              solveK_;
             word              solveEps_;
