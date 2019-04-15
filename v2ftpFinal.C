@@ -1764,10 +1764,16 @@ void v2ftpFinal::correct()
 	}
 	
 	if(cp1Type_.value() == 5.0){
-		cP1eqn_ = cP1_ - 0.8 + 0.8*gamma_*(1.0-sqrt(IIb));
+		cP1eqn_ = cP1_*(1.0-0.5*gamma_*sqrt(IIb));    
 	}
 	
+	if(cp1Type_.value() == 6.0){
+		cP1eqn_ = cP1_*(1.0 - 0.4*gamma_ + 0.2*((psiActual & psiActual)/(cMu_*phiActual*k_)));
+	}		
 	
+	if(cp1Type_.value() == 7.0){
+		cP1eqn_ = cP1_*(1.5 - sqrt(IIb));    
+	}
 	
     //*************************************//
     // Fix for separated flows 
@@ -1801,7 +1807,7 @@ void v2ftpFinal::correct()
 	volScalarField fwall 
     (
         "v2ftpFinal::fwall",
-		(2.0*alpha_-1.0)*epsHat_*tpphi_
+		IIb*epsHat_*tpphi_
 	); 
 		
 
