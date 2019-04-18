@@ -238,7 +238,7 @@ v2ftpFinal::v2ftpFinal
         (
             "cN2",
             coeffDict_,
-            2.2
+            0.6
         )
     ),
     cND1_
@@ -1728,7 +1728,7 @@ void v2ftpFinal::correct()
 	chi_ = 2.0*alpha_*rII;
 	upsilon_ = (4.0/3.0)*(1.75*alpha_-0.375)*k_ ;
 
-	const volScalarField uudk("uudk",upsilon_/k_);
+	const volScalarField uudk("uudk",upsilon_/(k_ + k0_));
 	const volScalarField wwdk("wwdk",chi_/k_);
 	
 	const volScalarField bup("bup", upsilon_/k_ - (2.0/3.0));
@@ -1768,11 +1768,11 @@ void v2ftpFinal::correct()
 	}
 	
 	if(cp1Type_.value() == 6.0){
-		cP1eqn_ = cP1_*(1.0 - 0.4*gamma_ + 0.2*((psiActual & psiActual)/(cMu_*phiActual*k_)));
+		cP1eqn_ = cP1_*(1.0 - 0.4*gamma_ + 0.15*((psiActual & psiActual)/(cMu_*phiActual*k_)));
 	}		
 	
 	if(cp1Type_.value() == 7.0){
-		cP1eqn_ = cP1_*(1.5 - sqrt(IIb));    
+		cP1eqn_ = cP1_*(1.4 - sqrt(IIb));    
 	}
 	
     //*************************************//
@@ -1797,6 +1797,12 @@ void v2ftpFinal::correct()
         -(cP1eqn_-(1.0-gamma_))*bph/T 	 
 	);
 	
+	volScalarField slowPSnonlin
+    (
+        "v2ftpFinal::slowPSnonlin",
+        cD2_*(sqr(bph) + (tppsi_ & tppsi_) - (2.0/3.0)*IIb)/T	 
+	);
+	
 	volScalarField fastPS
     (
         "v2ftpFinal::fastPS",
@@ -1817,7 +1823,8 @@ void v2ftpFinal::correct()
      ==
       - fvm::Sp(1.0/L2, f_)
 	  + fwall/L2
-      + slowPS/L2 
+      + slowPS/L2
+	  + slowPSnonlin/L2	  
 	  + fastPS/L2
 	  + transPhi/L2
     );
@@ -1904,7 +1911,8 @@ void v2ftpFinal::correct()
 	  //+ addedPsiProd //3d Psi production
 
 	  // Slow Pressure Strain
-      - fvm::Sp(cD2_*cP1eqn_/T,tppsi_)
+      - fvm::Sp(cP1eqn_/T,tppsi_)
+	  + cD2_*(bph + (uudk-(2.0/3.0)))*tppsi_/T
 	      
 	  // Fast Pressure Strain      
 	  - cP2_*vecProd/(k_+k0_)
@@ -1941,7 +1949,7 @@ void v2ftpFinal::correct()
 
 	//nut_ = cMu_*(0.6*phiActual + 2.2*(psiActual & tppsi_))*k_/epsilon_;	
 
-	nut_ = (cN1_ + (2.0/3.0)*(psiActual & psiActual)/(cMu_*phiActual*k_))*cMu_*phiActual/epsHat_;
+	nut_ = (cN1_ + cN2_*(psiActual & psiActual)/(cMu_*phiActual*k_))*cMu_*phiActual/epsHat_;  
 	
 	//nut_ = cMu_*(cN1_ + cN2_*sqrt(IIb))*tpphi_*k_*T;
     
