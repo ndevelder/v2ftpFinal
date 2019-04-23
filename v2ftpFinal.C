@@ -1597,13 +1597,14 @@ void v2ftpFinal::correct()
     
 	alpha_ = 1.0/(1.0 + 1.5*tpphi_);
 	
-	volScalarField IIb("IIb", alpha_*(2.0*alpha_-1.0));	
+	//volScalarField IIb("IIb", alpha_*(2.0*alpha_-1.0));	
+	volScalarField IIb("IIb", 2.0*(0.5*sqr(2.0*alpha_-1.0) + 0.6*(tppsi_ & tppsi_)));
 	bound(IIb, SMALL);
 	
 	volScalarField phiActual("phiActual",tpphi_*k_);
 	volVectorField psiActual("psiActual",tppsi_*k_);
 	
-	volScalarField nutExact("nutExact", mag(psiActual)/(mag(vorticity_) + (cNL_/Ts())));
+	volScalarField nutExact("nutExact", mag(psiActual)/(mag(vorticity_) + (cNL_/T)));
     volScalarField gammaNut("gammaNut", nut_);
 	
 	//volScalarField gammaNut("gammaNut", (alpha_*(psiActual & psiActual) + 0.57*(1.0-alpha_)*phiActual*phiActual)/(epsHat_*k_));
@@ -1626,6 +1627,14 @@ void v2ftpFinal::correct()
 	
 	if(nutType_.value() == 5.0){
 		gammaNut = alpha_*nutExact + (0.5/cMu_)*(1.0-alpha_)*tpphi_*nut_;
+	}
+	
+	if(nutType_.value() == 6.0){
+		gammaNut = IIb*nutExact + (0.5/cMu_)*(1.0-IIb)*tpphi_*nut_;
+	}
+	
+	if(nutType_.value() == 7.0){
+		gammaNut = nut_;
 	}
 	
 	volScalarField gammaWall("gammaWall", 3.0*nu()*(gradTpphiSqrt & gradTpphiSqrt)*k_/epsilon_); 
@@ -1949,7 +1958,7 @@ void v2ftpFinal::correct()
 
 	//nut_ = cMu_*(0.6*phiActual + 2.2*(psiActual & tppsi_))*k_/epsilon_;	
 
-	nut_ = (cN1_ + cN2_*(psiActual & psiActual)/(cMu_*phiActual*k_))*cMu_*phiActual/epsHat_;  
+	nut_ = (cN1_ + (1.0 - cN1_)*(psiActual & psiActual)/(cMu_*phiActual*k_))*cMu_*phiActual/epsHat_;  
 	
 	//nut_ = cMu_*(cN1_ + cN2_*sqrt(IIb))*tpphi_*k_*T;
     
