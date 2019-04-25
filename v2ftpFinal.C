@@ -1687,9 +1687,9 @@ void v2ftpFinal::correct()
       + fvm::SuSp(-fvc::div(phi_), epsilon_)
       - fvm::laplacian(DepsilonEff(), epsilon_)
      ==
-       cEp1eqn*G_/T
-     - fvm::Sp(cEp2_/T,epsilon_)
-     + cEp3_*tpProd3d_/T
+       cEp1eqn*G_*epsHat_
+     - fvm::Sp(cEp2_*epsHat_,epsilon_)
+     + cEp3_*tpProd3d_*epsHat_
     );
 
     if(solveEps_ == "true")
@@ -1773,7 +1773,7 @@ void v2ftpFinal::correct()
 	}
 	
 	if(cp1Type_.value() == 5.0){
-		cP1eqn_ = cP1_*(1.0-0.5*gamma_*sqrt(IIb));    
+		cP1eqn_ = cP1_*(1.0-0.4*gamma_*sqrt(IIb));      
 	}
 	
 	if(cp1Type_.value() == 6.0){
@@ -1815,14 +1815,14 @@ void v2ftpFinal::correct()
 	volScalarField fastPS
     (
         "v2ftpFinal::fastPS",
-		0.667*cP2_*GdK
+		(2.0/3.0)*cP2_*GdK
 	);
 	
 	   
 	volScalarField fwall 
     (
         "v2ftpFinal::fwall",
-		IIb*epsHat_*tpphi_
+		(2.0/3.0)*sqr(IIb)*epsHat_*tpphi_ 
 	); 
 		
 
@@ -1925,14 +1925,14 @@ void v2ftpFinal::correct()
 	      
 	  // Fast Pressure Strain      
 	  - cP2_*vecProd/(k_+k0_)
-	  - (cP3_-cD1_*gamma_)*(1.0-sqrt(IIb))*vorticity_  
+	  - cP3_*(1.0-sqrt(IIb))*vorticity_  
 	  
 	  // Extra term for fixing hump recirc zone
 	  + cP4_*((1.0-gamma_)/sqrt(1.12-alpha_))*sqrt((epsilon_ + epsilonSmall_)/nu())*tppsi_
 	  
 	  // Dissipation 
 	  + (1.0-gamma_)*tppsi_/T
-	  // Near wall included in Fast Pressure Strain 
+	  + cD1_*gamma_*(1.0-IIb)*vorticity_     
 	  
 	  // From K equation
 	  - fvm::Sp(tpProd_,tppsi_)
