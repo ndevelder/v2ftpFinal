@@ -454,6 +454,11 @@ v2ftpFinal::v2ftpFinal
    (
        coeffDict_.lookup("solveNut")
    ),
+   
+   force2D_
+   (
+       coeffDict_.lookup("force2D")
+   ),
 
    eqncEp1_
    (
@@ -1860,7 +1865,7 @@ void v2ftpFinal::correct()
 		//phiProd_/(k_+k0_)
 		
 	    //Source - pressure strain
-        min(f_,(slowPS + fastPS + fwall + transPhi))
+        min(f_,(slowPS + slowPSnonlin + fastPS + fwall + transPhi))
 		   
         //BC wall correct	
 	  - fvm::Sp(fwall/(tpphi_+tph0),tpphi_)
@@ -1904,7 +1909,7 @@ void v2ftpFinal::correct()
 
 	
 	//volVectorField psiDisWall("psiDisWall", cD1_*sqr(gamma_)*psExtra);
-    volVectorField psiDisWall("psiDisWall", cD1_*gamma_*(1.0-sqrt(IIb))*vorticity_);
+    volVectorField psiDisWall("psiDisWall", (cP3_ - cD1_*gamma_)*(1.0-sqrt(IIb))*vorticity_);
 	
     tmp<fvVectorMatrix> tppsiEqn
     (
@@ -1925,15 +1930,14 @@ void v2ftpFinal::correct()
 	      
 	  // Fast Pressure Strain      
 	  - cP2_*vecProd/(k_+k0_)
-	  - cP3_*(1.0-sqrt(IIb))*vorticity_  
+	  - psiDisWall   
 	  
 	  // Extra term for fixing hump recirc zone
 	  + cP4_*((1.0-gamma_)/sqrt(1.12-alpha_))*sqrt((epsilon_ + epsilonSmall_)/nu())*tppsi_
 	  
 	  // Dissipation 
 	  + (1.0-gamma_)*tppsi_/T
-	  + cD1_*gamma_*(1.0-IIb)*vorticity_     
-	  
+	        
 	  // From K equation
 	  - fvm::Sp(tpProd_,tppsi_)
 
@@ -1947,6 +1951,13 @@ void v2ftpFinal::correct()
 		solve(tppsiEqn);    
     }  
 
+    if(force2D_ == "true")
+    {
+		Info << "Force 2D Psi Components" << endl;
+		tppsi_.replace(vector::X, 0.0*tppsi_.component(vector::X));
+		tppsi_.replace(vector::Y, 0.0*tppsi_.component(vector::Y));
+		tppsi_.correctBoundaryConditions();
+    } 
 	
 	psiActual = tppsi_*k_;
 	phiActual = tpphi_*k_;

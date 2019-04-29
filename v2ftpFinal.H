@@ -119,6 +119,7 @@ class v2ftpFinal
             word              solvePsi_;
             word              solvePhi_;
             word              solveNut_;
+			word			  force2D_;
             word              eqncEp1_;
             word              eqncEp2_;
        	    word              eqnEpsHat_;
@@ -126,6 +127,7 @@ class v2ftpFinal
 			word              tslimiter_;
 			word              lslimiter_;
 			word			  eqncMu_;
+			
 
 
         //- Wall distance field
