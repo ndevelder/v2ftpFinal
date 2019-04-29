@@ -972,7 +972,7 @@ v2ftpFinal::v2ftpFinal
             runTime_.timeName(),
             U_.db(),
             IOobject::MUST_READ,
-            IOobject::NO_WRITE
+            IOobject::AUTO_WRITE
         ),
         tpphi_
     ),
@@ -1883,7 +1883,7 @@ void v2ftpFinal::correct()
 	bound(tpphi_,tph0);
 
 	
-	
+	wdamp_ = f_/(slowPS + slowPSnonlin + fastPS + fwall + transPhi);
 	
     //*************************************//   
     // Psi Equation
@@ -2001,6 +2001,7 @@ void v2ftpFinal::correct()
     Info<< "Max nut: " << gMax(nut_) << " Max K: " << gMax(k_) << " Max Epsilon: " << gMax(epsilon_) << " Max Phi: " << gMax(phiActual) <<endl;
     Info<< "Max Psi: " << gMax(psiActual) << " Min Psi: " << gMin(psiActual) << endl;
 	Info<< "Max vorticity: " << gMax(vorticity_) << " Min vorticity: " << gMin(vorticity_) << endl;
+	Info<< "Max U: " << gMax(U_) << " Min vorticity: " << gMin(U_) << endl;
 	Info << " * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" << endl;  
 	}
 	  
