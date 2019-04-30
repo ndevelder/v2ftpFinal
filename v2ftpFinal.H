@@ -76,7 +76,7 @@ class v2ftpFinal
     // Private data
 
         // Model coefficients
-            dimensionedScalar cEp1_;
+            dimensionedScalar cEp1_;  
             dimensionedScalar cEp2con_;
             dimensionedScalar cEp3_;
 			dimensionedScalar cEp4_;
@@ -84,6 +84,7 @@ class v2ftpFinal
             dimensionedScalar cD2_;
 			dimensionedScalar cG_;
 			dimensionedScalar cGw_;
+			dimensionedScalar cFw_;
             dimensionedScalar cP1_;
             dimensionedScalar cP2_;
             dimensionedScalar cP3_;
@@ -173,6 +174,7 @@ class v2ftpFinal
             volScalarField tpProd3d_;
 			volScalarField f_;
 			volScalarField wdamp_;
+			volScalarField fsource_;
 			volSymmTensorField Rev_;
 			volScalarField D_;
 			volTensorField J_;

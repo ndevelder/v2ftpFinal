@@ -160,6 +160,15 @@ v2ftpFinal::v2ftpFinal
             0.0
         )
     ),
+    cFw_
+    (
+        dimensionedScalar::lookupOrAddToDict
+        (
+            "cFw",
+       	    coeffDict_,
+            0.4
+        )
+    ),
     cP1_
     (
         dimensionedScalar::lookupOrAddToDict
@@ -977,6 +986,19 @@ v2ftpFinal::v2ftpFinal
         tpphi_
     ),
 	
+	fsource_
+    (
+        IOobject
+        (
+            "fsource",
+            runTime_.timeName(),
+            U_.db(),
+            IOobject::MUST_READ,
+            IOobject::AUTO_WRITE
+        ),
+        f_
+    ),
+	
 	Rev_
     (
         IOobject
@@ -1397,6 +1419,7 @@ bool v2ftpFinal::read()
 		cD2_.readIfPresent(coeffDict());
 		cG_.readIfPresent(coeffDict());
 		cGw_.readIfPresent(coeffDict());
+		cFw_.readIfPresent(coeffDict());
 		cT_.readIfPresent(coeffDict());
 		cA_.readIfPresent(coeffDict());
 		cNF_.readIfPresent(coeffDict());
@@ -1820,14 +1843,14 @@ void v2ftpFinal::correct()
 	volScalarField fastPS
     (
         "v2ftpFinal::fastPS",
-		(2.0/3.0)*cP2_*GdK
+		(2.0/3.0)*cP2_*GdK  
 	);
 	
 	   
 	volScalarField fwall 
     (
         "v2ftpFinal::fwall",
-		(2.0/3.0)*sqr(IIb)*epsHat_*tpphi_ 
+		cFw_*alpha_*sqr(IIb)*epsHat_*tpphi_ 
 	); 
 		
 
@@ -1884,6 +1907,7 @@ void v2ftpFinal::correct()
 
 	
 	wdamp_ = f_/(slowPS + slowPSnonlin + fastPS + fwall + transPhi);
+	fsource_ = min(f_,(slowPS + slowPSnonlin + fastPS + fwall + transPhi)) - fwall;
 	
     //*************************************//   
     // Psi Equation
@@ -1921,7 +1945,7 @@ void v2ftpFinal::correct()
       == 
 
 	  // Production
-	    vecProd/(k_+k0_)
+	    tpphi_*vorticity_
 	  //+ addedPsiProd //3d Psi production
 
 	  // Slow Pressure Strain
@@ -1929,7 +1953,7 @@ void v2ftpFinal::correct()
 	  + cD2_*(bph + (uudk-(2.0/3.0)))*tppsi_/T
 	      
 	  // Fast Pressure Strain      
-	  - cP2_*vecProd/(k_+k0_)
+	  - cP2_*tpphi_*vorticity_
 	  - psiDisWall   
 	  
 	  // Extra term for fixing hump recirc zone
