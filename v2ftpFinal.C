@@ -1715,9 +1715,9 @@ void v2ftpFinal::correct()
       + fvm::SuSp(-fvc::div(phi_), epsilon_)
       - fvm::laplacian(DepsilonEff(), epsilon_)
      ==
-       cEp1eqn*G_*epsHat_
-     - fvm::Sp(cEp2_*epsHat_,epsilon_)
-     + cEp3_*tpProd3d_*epsHat_
+       cEp1eqn*G_/T
+     - fvm::Sp(cEp2_/T,epsilon_)
+     + cEp3_*tpProd3d_/T
     );
 
     if(solveEps_ == "true")

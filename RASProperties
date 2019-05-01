@@ -55,7 +55,7 @@ v2ftpFinalCoeffs{
    cEp1                1.44;
    cEp2con			   1.83;
    cEp3                0.15;
-   cEp4                0.04;
+   cEp4                0.06;
    cEhmP               0.79;
    cEhmM			   10.0;
    cEhmPK			   0.12;
@@ -77,7 +77,7 @@ v2ftpFinalCoeffs{
    tslimiter           true;  
    lslimiter           true;   
  
-   cD1                 0.02; 
+   cD1                 0.03; 
    cD2                 0.0;
 
    psExtraType         1.0;
@@ -87,7 +87,7 @@ v2ftpFinalCoeffs{
    cP3                 0.15; 
    cP4                 0.008;
    cP5                 0.0;
-   cFw				   0.4;
+   cFw				   0.6;
 
    cG                  0.05; 
    cGw                 1.0;
