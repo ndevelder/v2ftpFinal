@@ -34,11 +34,11 @@ v2ftpFinalCoeffs{
    eqnSigmaPsi         false;
 
    sigmaK			   1.0; 
-   sigmaEps 		   0.83; 
-   sigmaPhi       	   0.5;
+   sigmaEps 		   0.8; 
+   sigmaPhi       	   0.4;
    sigmaPsi       	   1.0;
    
-   prodType            1.0;
+   prodType            1.1;
    pMix  	           0.5;
    cPr                 1.0;
    cPw                 0.0;
@@ -62,34 +62,34 @@ v2ftpFinalCoeffs{
    cEhmPK2			   0.67;
 
    
-   nutType             5.0;
+   nutType             5.0;  
    eqncMu 	           false;
    cMu                 0.21;
    betaK			   0.09;
    nutRatMax 		   1e5;
-   cN1                 0.63;
+   cN1                 0.7;
    cN2                 0.6;
-   cND1                1.0;
+   cND1                1.0; 
    cND2				   1.0;
    
-   cL1	               0.36; 
-   cL2                 90.0; 
+   cL1	               0.45;  
+   cL2                 70.0; 
    tslimiter           true;  
    lslimiter           true;   
  
-   cD1                 0.03; 
+   cD1                 0.0; 
    cD2                 0.0;
 
    psExtraType         1.0;
-   cp1Type             6.0;
+   cp1Type             1.0;
    cP1                 1.4; 
-   cP2                 0.4;
-   cP3                 0.15; 
+   cP2                 0.45;
+   cP3                 0.11; 
    cP4                 0.008;
    cP5                 0.0;
-   cFw				   0.6;
+   cFw	               0.5;
 
-   cG                  0.05; 
+   cG                  0.12; 
    cGw                 1.0;
    cNF                 0.0;
    cNL                 1e-6;

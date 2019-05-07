@@ -1521,13 +1521,7 @@ void v2ftpFinal::correct()
 	// volScalarField H("H", funit_ & (funit_ & S_));
 
 	
-    //*************************************//	
-    // Length and Time Scales
-    //*************************************//	
 	
-	const volScalarField L("Length",Ls());
-	const volScalarField L2("Lsqr",sqr(L));
-	const volScalarField T("Time",Ts());	
 
 
 	
@@ -1552,6 +1546,25 @@ void v2ftpFinal::correct()
 	const volVectorField gradTpphiSqrt("gradTpphiSqrt",fvc::grad(tpphiSqrt_));
 	
     gradTppsi_ = fvc::grad(tppsi_);
+	
+	
+	//*************************************//	
+    // Update Epsilon-hat
+    //*************************************//
+    
+    epsHat_ = epsilon_/(k_ + (cEhmM_*nu()*mag(gradkSqrt_)));
+    bound(epsHat_,eH0);	
+		
+	epsilon_.boundaryField().updateCoeffs();
+	
+	
+    //*************************************//	
+    // Length and Time Scales
+    //*************************************//	
+	
+	const volScalarField L("Length",cL1_*max(kSqrt_*(k_ + (cEhmM_*nu()*mag(gradkSqrt_)))/epsilon_,cL2_*pow(pow3(nu())/(epsilon_ + epsilonSmall_),0.25)));
+	const volScalarField L2("Lsqr",sqr(L));
+	const volScalarField T("Time",(k_ + (cEhmM_*nu()*mag(gradkSqrt_)))/epsilon_);
 
 
 	
@@ -1667,7 +1680,9 @@ void v2ftpFinal::correct()
 	
 	volScalarField gammaWall("gammaWall", 3.0*nu()*(gradTpphiSqrt & gradTpphiSqrt)*k_/epsilon_); 
 
-	gamma_ = 1.0/(1.0 + cG_*gammaNut/nu() + cGw_*gammaWall);
+	//gamma_ = 1.0/(1.0 + cG_*gammaNut/nu() + cGw_*gammaWall);
+	
+	gamma_ = 1.0/(1.0 + cG_*sqrt((tppsi_ & tppsi_))*nut_/nu() + 1.5*tpphi_ + cGw_*gammaWall);
 	
 	
     //*************************************//
@@ -1692,14 +1707,7 @@ void v2ftpFinal::correct()
 	
 	
 
-	//*************************************//	
-    // Update Epsilon-hat
-    //*************************************//
-    
-    epsHat_ = epsilon_/(k_ + (cEhmM_*nu()*mag(gradkSqrt_)));
-    bound(epsHat_,eH0);	
-		
-	epsilon_.boundaryField().updateCoeffs();
+
 	
 	
 	
@@ -1715,9 +1723,9 @@ void v2ftpFinal::correct()
       + fvm::SuSp(-fvc::div(phi_), epsilon_)
       - fvm::laplacian(DepsilonEff(), epsilon_)
      ==
-       cEp1eqn*G_/T
-     - fvm::Sp(cEp2_/T,epsilon_)
-     + cEp3_*tpProd3d_/T
+       cEp1eqn*G_*epsHat_
+     - fvm::Sp(cEp2_*epsHat_,epsilon_)
+     + cEp3_*tpProd3d_*epsHat_
     );
 
     if(solveEps_ == "true")
@@ -1801,11 +1809,11 @@ void v2ftpFinal::correct()
 	}
 	
 	if(cp1Type_.value() == 5.0){
-		cP1eqn_ = cP1_*(1.0-0.4*gamma_*sqrt(IIb));      
+		cP1eqn_ = cP1_*(1.0-0.28*gamma_*sqrt(IIb));      
 	}
 	
-	if(cp1Type_.value() == 6.0){
-		cP1eqn_ = cP1_*(1.0 - 0.4*gamma_ + 0.15*((psiActual & psiActual)/(cMu_*phiActual*k_)));
+	if(cp1Type_.value() == 6.0){ 
+		cP1eqn_ = cP1_*(1.0 - 0.25*gamma_ + 0.1*((psiActual & psiActual)/(cMu_*phiActual*k_)));
 	}		
 	
 	if(cp1Type_.value() == 7.0){
@@ -1831,13 +1839,13 @@ void v2ftpFinal::correct()
 	volScalarField slowPS 
     (
         "v2ftpFinal::slowPS",
-        -(cP1eqn_-(1.0-gamma_))*bph/T 	 
+        -(cP1eqn_ - alpha_)*bph*epsHat_ 	 
 	);
 	
 	volScalarField slowPSnonlin
     (
         "v2ftpFinal::slowPSnonlin",
-        cD2_*(sqr(bph) + (tppsi_ & tppsi_) - (2.0/3.0)*IIb)/T	 
+        cD2_*(sqr(bph) + (tppsi_ & tppsi_) - (2.0/3.0)*IIb)*epsHat_	 
 	);
 	
 	volScalarField fastPS
@@ -1896,8 +1904,8 @@ void v2ftpFinal::correct()
 	    //From k eqn phi/k derivation
       - fvm::Sp(GdK, tpphi_)
 
-	    // Dissipation included in pressure strain term
-	    //+ (1.0-gamma_)*bph/T
+	  // Dissipation accounted for in PS
+	  //+ (1.0-gamma_)*bph*epsHat_
     ); 
 	
 
@@ -1949,8 +1957,8 @@ void v2ftpFinal::correct()
 	  //+ addedPsiProd //3d Psi production
 
 	  // Slow Pressure Strain
-      - fvm::Sp(cP1eqn_/T,tppsi_)
-	  + cD2_*(bph + (uudk-(2.0/3.0)))*tppsi_/T
+      - fvm::Sp(cP1eqn_*epsHat_,tppsi_)
+	  + cD2_*(bph + (uudk-(2.0/3.0)))*tppsi_*epsHat_
 	      
 	  // Fast Pressure Strain      
 	  - cP2_*tpphi_*vorticity_
@@ -1960,7 +1968,7 @@ void v2ftpFinal::correct()
 	  + cP4_*((1.0-gamma_)/sqrt(1.12-alpha_))*sqrt((epsilon_ + epsilonSmall_)/nu())*tppsi_
 	  
 	  // Dissipation 
-	  + (1.0-gamma_)*tppsi_/T
+	  + alpha_*tppsi_*epsHat_
 	        
 	  // From K equation
 	  - fvm::Sp(tpProd_,tppsi_)
@@ -2015,6 +2023,7 @@ void v2ftpFinal::correct()
 	volScalarField uTauSquared((nu() + nut_)*vorticity_.component(2));
 	volVectorField addedPsiG(addedPsiProd*k_);
 	volVectorField phiOmega(tpphi_*k_*vorticity_);
+	volScalarField cp1mod(cP1eqn_ - alpha_);
 	
 
 	Info << " * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" << endl;
@@ -2026,6 +2035,9 @@ void v2ftpFinal::correct()
     Info<< "Max Psi: " << gMax(psiActual) << " Min Psi: " << gMin(psiActual) << endl;
 	Info<< "Max vorticity: " << gMax(vorticity_) << " Min vorticity: " << gMin(vorticity_) << endl;
 	Info<< "Max U: " << gMax(U_) << " Min vorticity: " << gMin(U_) << endl;
+	Info<< "Max L^2: " << gMax(L2) << " Min L^2: " << gMin(L2) << endl;
+	Info<< "Max cp1mod: " << gMax(cp1mod) << " Min cp1mod: " << gMin(cp1mod) << endl;
+	Info<< "Max fastPS: " << gMax(fastPS) << " Min fastPS: " << gMin(fastPS) << endl;
 	Info << " * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" << endl;  
 	}
 	  
