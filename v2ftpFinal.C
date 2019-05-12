@@ -1564,7 +1564,7 @@ void v2ftpFinal::correct()
 	
 	const volScalarField L("Length",cL1_*max(kSqrt_*(k_ + (cEhmM_*nu()*mag(gradkSqrt_)))/epsilon_,cL2_*pow(pow3(nu())/(epsilon_ + epsilonSmall_),0.25)));
 	const volScalarField L2("Lsqr",sqr(L));
-	const volScalarField T("Time",(k_ + (cEhmM_*nu()*mag(gradkSqrt_)))/epsilon_);
+	const volScalarField T("Time",max((k_ + (cEhmM_*nu()*mag(gradkSqrt_)))/epsilon_, 6.0*sqrt(nu()/(epsilon_ + epsilonSmall_))));
 
 
 	
@@ -1723,9 +1723,9 @@ void v2ftpFinal::correct()
       + fvm::SuSp(-fvc::div(phi_), epsilon_)
       - fvm::laplacian(DepsilonEff(), epsilon_)
      ==
-       cEp1eqn*G_*epsHat_
-     - fvm::Sp(cEp2_*epsHat_,epsilon_)
-     + cEp3_*tpProd3d_*epsHat_
+       cEp1eqn*G_/T
+     - fvm::Sp(cEp2_/T,epsilon_)
+     + cEp3_*tpProd3d_/T
     );
 
     if(solveEps_ == "true")
@@ -1817,7 +1817,11 @@ void v2ftpFinal::correct()
 	}		
 	
 	if(cp1Type_.value() == 7.0){
-		cP1eqn_ = cP1_*(1.4 - sqrt(IIb));    
+		cP1eqn_ = 1.4*(1.73 - sqrt(IIb)/alpha_);    
+	}
+	
+	if(cp1Type_.value() == 8.0){ 
+		cP1eqn_ = cP1_*(0.9 - 0.15*gamma_ + 0.15*((psiActual & psiActual)/(cMu_*phiActual*k_)));
 	}
 	
     //*************************************//
@@ -1839,13 +1843,13 @@ void v2ftpFinal::correct()
 	volScalarField slowPS 
     (
         "v2ftpFinal::slowPS",
-        -(cP1eqn_ - alpha_)*bph*epsHat_ 	 
+        -(cP1eqn_ - alpha_)*bph/T 	 
 	);
 	
 	volScalarField slowPSnonlin
     (
         "v2ftpFinal::slowPSnonlin",
-        cD2_*(sqr(bph) + (tppsi_ & tppsi_) - (2.0/3.0)*IIb)*epsHat_	 
+        cD2_*(sqr(bph) + (tppsi_ & tppsi_) - (2.0/3.0)*IIb)/T	 
 	);
 	
 	volScalarField fastPS
@@ -1905,7 +1909,7 @@ void v2ftpFinal::correct()
       - fvm::Sp(GdK, tpphi_)
 
 	  // Dissipation accounted for in PS
-	  //+ (1.0-gamma_)*bph*epsHat_
+	  //+ (1.0-gamma_)*bph/T
     ); 
 	
 
@@ -1939,6 +1943,13 @@ void v2ftpFinal::correct()
 		psExtra = cP3_*(1.0-alpha_)*vorticity_;
 	}	
 
+	if(psExtraType_.value() == 4.0){
+		psExtra = cP3_*tpphi_*vorticity_;
+	}
+	
+	if(psExtraType_.value() == 5.0){
+		psExtra = cP3_*tppsi_*tpProd_;
+	}
 	
 	//volVectorField psiDisWall("psiDisWall", cD1_*sqr(gamma_)*psExtra);
     volVectorField psiDisWall("psiDisWall", (cP3_ - cD1_*gamma_)*(1.0-sqrt(IIb))*vorticity_);
@@ -1957,18 +1968,18 @@ void v2ftpFinal::correct()
 	  //+ addedPsiProd //3d Psi production
 
 	  // Slow Pressure Strain
-      - fvm::Sp(cP1eqn_*epsHat_,tppsi_)
-	  + cD2_*(bph + (uudk-(2.0/3.0)))*tppsi_*epsHat_
+      - fvm::Sp(cP1eqn_/T,tppsi_)
+	  + cD2_*(bph + (uudk-(2.0/3.0)))*tppsi_/T
 	      
 	  // Fast Pressure Strain      
 	  - cP2_*tpphi_*vorticity_
-	  - psiDisWall   
+	  - psExtra   
 	  
 	  // Extra term for fixing hump recirc zone
 	  + cP4_*((1.0-gamma_)/sqrt(1.12-alpha_))*sqrt((epsilon_ + epsilonSmall_)/nu())*tppsi_
 	  
 	  // Dissipation 
-	  + alpha_*tppsi_*epsHat_
+	  + alpha_*tppsi_/T
 	        
 	  // From K equation
 	  - fvm::Sp(tpProd_,tppsi_)
