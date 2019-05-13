@@ -81,7 +81,7 @@ v2ftpFinalCoeffs{
    cD2                 0.0;
 
    psExtraType         1.0;
-   cp1Type             8.0;
+   cp1Type             1.0;
    cP1                 1.4; 
    cP2                 0.45;
    cP3                 0.12; 
