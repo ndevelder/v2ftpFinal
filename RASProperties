@@ -48,6 +48,7 @@ v2ftpFinalCoeffs{
    transType           6.0;
    cT                  0.0;
    cA                  0.0;
+   cB                  0.06;
    
    eqncEp1             true;
    eqncEp2             false;
@@ -89,7 +90,7 @@ v2ftpFinalCoeffs{
    cP5                 0.0;
    cFw				   0.6;
 
-   cG                  0.12; 
+   cG                  0.1; 
    cGw                 1.0;
    cNF                 0.0;
    cNL                 1e-6;

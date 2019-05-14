@@ -82,6 +82,7 @@ class v2ftpFinal
 			dimensionedScalar cEp4_;
 			dimensionedScalar cD1_;
             dimensionedScalar cD2_;
+            dimensionedScalar cB_;
 			dimensionedScalar cG_;
 			dimensionedScalar cGw_;
 			dimensionedScalar cFw_;
@@ -155,6 +156,7 @@ class v2ftpFinal
             volScalarField epsHat_;
 			volScalarField kSqrt_;
 			volScalarField alpha_;
+            volScalarField beta_;
 			volScalarField gamma_;
 			volScalarField upsilon_;
 			volScalarField chi_;
@@ -348,7 +350,7 @@ public:
         {
             return tmp<volScalarField>
             (
-                new volScalarField("DphiEff", nut_*ndsPhi_*sigmaPhi_ + nu())
+                new volScalarField("DphiEff", nut_*sigmaPhi_ + nu())
             );
         }
 
@@ -357,7 +359,7 @@ public:
         {
             return tmp<volScalarField>
             (
-                new volScalarField("DpsiEff", nut_*ndsPsi_*sigmaPsi_ + nu())
+                new volScalarField("DpsiEff", nut_*sigmaPsi_ + nu())
             );
         }
 

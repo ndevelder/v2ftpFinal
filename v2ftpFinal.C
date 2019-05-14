@@ -142,6 +142,15 @@ v2ftpFinal::v2ftpFinal
             1.0
         )
     ),
+    cB_
+    (
+        dimensionedScalar::lookupOrAddToDict
+        (
+            "cB",
+            coeffDict_,
+            0.07
+        )
+    ),
     cG_
     (
         dimensionedScalar::lookupOrAddToDict
@@ -738,7 +747,20 @@ v2ftpFinal::v2ftpFinal
         ),
         (1.0/(1.0 + 1.5*tpphi_))
     ),
-	
+
+    beta_
+    (
+        IOobject
+        (
+            "beta",
+            runTime_.timeName(),
+            U_.db(),
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        tpphi_
+    ),
+
 	gamma_
     (
         IOobject
@@ -1417,6 +1439,7 @@ bool v2ftpFinal::read()
 		cPrP_.readIfPresent(coeffDict());
 		cD1_.readIfPresent(coeffDict());
 		cD2_.readIfPresent(coeffDict());
+        cB_.readIfPresent(coeffDict());
 		cG_.readIfPresent(coeffDict());
 		cGw_.readIfPresent(coeffDict());
 		cFw_.readIfPresent(coeffDict());
@@ -1641,9 +1664,13 @@ void v2ftpFinal::correct()
 	//volScalarField IIb("IIb", alpha_*(2.0*alpha_-1.0));	
 	volScalarField IIb("IIb", 2.0*(0.5*sqr(2.0*alpha_-1.0) + 0.6*(tppsi_ & tppsi_)));
 	bound(IIb, SMALL);
+
+
 	
 	volScalarField phiActual("phiActual",tpphi_*k_);
 	volVectorField psiActual("psiActual",tppsi_*k_);
+
+    beta_ = 1.0 - exp(-cB_*phiActual*phiActual/(nu()*epsilon_));
 	
 	volScalarField nutExact("nutExact", mag(psiActual)/(mag(vorticity_) + (cNL_/T)));
     volScalarField gammaNut("gammaNut", nut_);
@@ -1680,9 +1707,10 @@ void v2ftpFinal::correct()
 	
 	volScalarField gammaWall("gammaWall", 3.0*nu()*(gradTpphiSqrt & gradTpphiSqrt)*k_/epsilon_); 
 
-	//gamma_ = 1.0/(1.0 + cG_*gammaNut/nu() + cGw_*gammaWall);
-	
-	gamma_ = 1.0/(1.0 + cG_*sqrt((tppsi_ & tppsi_))*nut_/nu() + 1.5*tpphi_ + cGw_*gammaWall);
+	//gamma_ = 1.0/(1.0 + cG_*gammaNut/nu() + cGw_*gammaWall);	
+	//gamma_ = 1.0/(1.0 + cG_*sqrt((tppsi_ & tppsi_))*nut_/nu() + 1.5*tpphi_ + cGw_*gammaWall);
+
+    gamma_ = 1.0/(1.0 + cG_*sqrt(k_*k_/(nu()*epsilon_) + tph0));
 	
 	
     //*************************************//
@@ -1843,7 +1871,7 @@ void v2ftpFinal::correct()
 	volScalarField slowPS 
     (
         "v2ftpFinal::slowPS",
-        -(cP1eqn_ - alpha_)*bph/T 	 
+        -cP1eqn_*bph/T 	 
 	);
 	
 	volScalarField slowPSnonlin
@@ -1908,8 +1936,10 @@ void v2ftpFinal::correct()
 	    //From k eqn phi/k derivation
       - fvm::Sp(GdK, tpphi_)
 
-	  // Dissipation accounted for in PS
-	  //+ (1.0-gamma_)*bph/T
+	  // Dissipation
+	  - beta_*gamma_*bph/T
+      - (1.0 - sqrt(IIb) + beta_*sqrt(IIb))*(2.0/3.0)/T
+      + tpphi_/T
     ); 
 	
 
@@ -1979,7 +2009,8 @@ void v2ftpFinal::correct()
 	  + cP4_*((1.0-gamma_)/sqrt(1.12-alpha_))*sqrt((epsilon_ + epsilonSmall_)/nu())*tppsi_
 	  
 	  // Dissipation 
-	  + alpha_*tppsi_/T
+	  + tppsi_/T
+      - fvm::Sp(beta_*gamma_/T,tppsi_)
 	        
 	  // From K equation
 	  - fvm::Sp(tpProd_,tppsi_)
