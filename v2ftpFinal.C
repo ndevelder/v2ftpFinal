@@ -1627,7 +1627,7 @@ void v2ftpFinal::correct()
 	
 	if(prodType_.value() == 3.0){
 		Info<< "Using mixed 3 production term" <<endl;
-		tpProd_ = alpha_*mag(tppsi_ & vorticity_) + pMix_*(1.0-alpha_)*cPrK_*magS + (1.0-pMix_)*(1.0-alpha_)*cPrP_*tpphi_*magS;
+		tpProd_ = alpha_*(tppsi_ & vorticity_) + pMix_*(1.0-alpha_)*cPrK_*magS + (1.0-pMix_)*(1.0-alpha_)*cPrP_*tpphi_*magS;
 		G_ = tpProd_*k_;
 		GdK = tpProd_;	
     }
@@ -1662,7 +1662,7 @@ void v2ftpFinal::correct()
 	alpha_ = 1.0/(1.0 + 1.5*tpphi_);
 	
 	//volScalarField IIb("IIb", alpha_*(2.0*alpha_-1.0));	
-	volScalarField IIb("IIb", 2.0*(0.5*sqr(2.0*alpha_-1.0) + 0.6*(tppsi_ & tppsi_)));
+	volScalarField IIb("IIb", sqr(2.0*alpha_-1.0) + 2.0*(tppsi_ & tppsi_));
 	bound(IIb, SMALL);
 
 
@@ -1890,7 +1890,9 @@ void v2ftpFinal::correct()
 	volScalarField fwall 
     (
         "v2ftpFinal::fwall",
-		cFw_*alpha_*sqr(IIb)*epsHat_*tpphi_ 
+		//cFw_*alpha_*sqr(IIb)*epsHat_*tpphi_
+		//2.0*nu()*(gradTpphi_ & gradk_)/(k_ + k0_) + nu()*laplacian(tpphi_)
+		2.0*nu()*(gradTpphiSqrt & gradTpphiSqrt)
 	); 
 		
 
@@ -1906,7 +1908,7 @@ void v2ftpFinal::correct()
 	  + transPhi/L2
     );
  
-    fEqn().relax();
+    fEqn().relax();  
     solve(fEqn);
 	
     
