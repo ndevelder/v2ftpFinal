@@ -1864,7 +1864,6 @@ void v2ftpFinal::correct()
 	
 	
 	
-	
     //*************************************//
     // Pressure strain terms phi 
     //*************************************// 		
@@ -1891,8 +1890,8 @@ void v2ftpFinal::correct()
     (
         "v2ftpFinal::fwall",
 		//cFw_*alpha_*sqr(IIb)*epsHat_*tpphi_
-		//2.0*nu()*(gradTpphi_ & gradk_)/(k_ + k0_) + nu()*laplacian(tpphi_)
-		2.0*nu()*(gradTpphiSqrt & gradTpphiSqrt)
+		cFw_*nu()*(gradTpphi_ & gradk_)/(k_ + k0_) + nu()*fvc::laplacian(tpphi_)
+		//2.0*nu()*(gradTpphiSqrt & gradTpphiSqrt)
 	); 
 		
 
@@ -1933,14 +1932,15 @@ void v2ftpFinal::correct()
         min(f_,(slowPS + slowPSnonlin + fastPS + fwall + transPhi))
 		   
         //BC wall correct	
-	  - fvm::Sp(fwall/(tpphi_+tph0),tpphi_)
+	  //- fvm::Sp(fwall/(tpphi_+tph0),tpphi_)
+      + cFw_*nut_*(gradTpphi_ & gradk_)/(k_ + k0_)
 	  
 	    //From k eqn phi/k derivation
       - fvm::Sp(GdK, tpphi_)
 
 	  // Dissipation
 	  - beta_*gamma_*bph/T
-      - (1.0 - sqrt(IIb) + beta_*sqrt(IIb))*(2.0/3.0)/T
+      - (1.0 - (1.0 - beta_)*sqrt(IIb))*(2.0/3.0)/T
       + tpphi_/T
     ); 
 	
@@ -2011,8 +2011,7 @@ void v2ftpFinal::correct()
 	  + cP4_*((1.0-gamma_)/sqrt(1.12-alpha_))*sqrt((epsilon_ + epsilonSmall_)/nu())*tppsi_
 	  
 	  // Dissipation 
-	  + tppsi_/T
-      - fvm::Sp(beta_*gamma_/T,tppsi_)
+	  + (1.0-beta_*gamma_)*tppsi_/T
 	        
 	  // From K equation
 	  - fvm::Sp(tpProd_,tppsi_)
