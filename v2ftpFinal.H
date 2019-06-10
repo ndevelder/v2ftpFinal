@@ -250,6 +250,7 @@ public:
         {
 			//return mag(tppsi_)*k_/(mag(vorticity_) + (cNL_*nu()/sqr(Ls())));
             return mag(tppsi_)*k_/(mag(vorticity_) + (cNL_/Ts()));
+            //return nut_;
         }
 
         //- Return the phi/k
@@ -353,6 +354,17 @@ public:
                 new volScalarField("DphiEff", nut_*sigmaPhi_ + nu())
             );
         }
+
+
+        //- Return the effective diffusivity for epsilon
+        tmp<volScalarField> DphikEff() const
+        {
+            return tmp<volScalarField>
+            (
+                new volScalarField("DphikEff", nut_*sigmaPhi_)   
+            );
+        }
+
 
         //- Return the effective diffusivity for epsilon
         tmp<volScalarField> DpsiEff() const
