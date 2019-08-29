@@ -83,9 +83,12 @@ class v2ftpFinal
 			dimensionedScalar cD1_;
             dimensionedScalar cD2_;
             dimensionedScalar cB_;
-			dimensionedScalar cG_;
+			dimensionedScalar cGn_;
 			dimensionedScalar cGw_;
+            dimensionedScalar cLw_;   
+            dimensionedScalar cLn_;
 			dimensionedScalar cFw_;
+            dimensionedScalar cTk_;
             dimensionedScalar cP1_;
             dimensionedScalar cP2_;
             dimensionedScalar cP3_;
@@ -95,7 +98,7 @@ class v2ftpFinal
 			dimensionedScalar cL2_;
 			dimensionedScalar cN1_;
 			dimensionedScalar cN2_;
-			dimensionedScalar cND1_;
+			dimensionedScalar cND1_;   
 			dimensionedScalar cND2_;
             dimensionedScalar cMu_;
 			dimensionedScalar betaK_;
@@ -142,6 +145,7 @@ class v2ftpFinal
             volVectorField gradk_;
             volScalarField epsilon_;
             volScalarField nut_;
+            volScalarField rNut_;
             volScalarField nutNorm_;
             volScalarField tpphi_;
             volScalarField tpphiSqrt_;
@@ -158,7 +162,9 @@ class v2ftpFinal
 			volScalarField alpha_;
             volScalarField beta_;
 			volScalarField gamma_;
-			volScalarField upsilon_;
+            volScalarField lambda_;
+			volScalarField cMuRe_;
+            volScalarField upsilon_;
 			volScalarField chi_;
 			volScalarField phiSqrt_;
 			volScalarField phiProd_;
@@ -249,7 +255,7 @@ public:
         virtual tmp<volScalarField> nut() const
         {
 			//return mag(tppsi_)*k_/(mag(vorticity_) + (cNL_*nu()/sqr(Ls())));
-            return mag(tppsi_)*k_/(mag(vorticity_) + (cNL_/Ts()));
+            return rNut_;
             //return nut_;
         }
 
